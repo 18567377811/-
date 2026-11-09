@@ -32,13 +32,23 @@ function Write-Step([string]$msg) { Write-Host ""; Write-Host "==> $msg" -Foregr
 function Write-Ok([string]$msg)   { Write-Host "    $msg" -ForegroundColor Green }
 function Write-Warn([string]$msg) { Write-Host "    $msg" -ForegroundColor Yellow }
 
+# PowerShell 下 `npm` 常落到 npm.ps1（执行策略/截断会报 Unknown command: "pm"）
+# 优先用 npm.cmd
+function Get-NpmCmd {
+  $cmd = Get-Command npm.cmd -ErrorAction SilentlyContinue
+  if ($cmd) { return $cmd.Source }
+  $npm = Get-Command npm -ErrorAction SilentlyContinue
+  if ($npm) { return $npm.Source }
+  return $null
+}
+
 function Assert-Tools {
   foreach ($t in @("ssh", "scp")) {
     if (-not (Get-Command $t -ErrorAction SilentlyContinue)) {
       throw "Missing tool: $t. Install OpenSSH Client in Windows Optional Features."
     }
   }
-  if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+  if (-not (Get-NpmCmd)) {
     throw "Missing npm / Node.js"
   }
 }
@@ -89,17 +99,19 @@ if ($SetupSsl -and -not $InitServer) {
 
 if (-not $SkipBuild) {
   Write-Step "Local npm run build (standalone)"
+  $npmExe = Get-NpmCmd
+  Write-Ok "using: $npmExe"
   Push-Location $WebDir
   try {
     if (-not (Test-Path "node_modules")) {
       Write-Ok "npm ci"
       if (-not $DryRun) {
-        & npm ci
+        & $npmExe ci
         if ($LASTEXITCODE -ne 0) { throw "npm ci failed" }
       }
     }
     if (-not $DryRun) {
-      & npm run build
+      & $npmExe run build
       if ($LASTEXITCODE -ne 0) { throw "npm run build failed" }
     }
   }
