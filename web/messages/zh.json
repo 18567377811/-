@@ -156,9 +156,19 @@
     "empty": "购物车是空的",
     "subtotal": "小计",
     "checkout": "去结算",
+    "checkoutLoading": "正在跳转…",
+    "checkoutError": "无法开始结算，请稍后再试。",
     "remove": "移除",
     "quantity": "数量",
     "note": "付款后我们会发邮件，附上安全链接供你上传宠物照片。"
+  },
+  "checkout": {
+    "successEyebrow": "付款成功",
+    "successTitle": "谢谢 — 你的定制名额已预留。",
+    "successBody": "我们会尽快邮件告知上传宠物照片的下一步。请留意收件箱（含垃圾邮件）。",
+    "reference": "订单参考号",
+    "photoGuide": "拍照指南",
+    "backHome": "返回首页"
   },
   "footer": {
     "shop": "选购",
@@ -168,7 +178,29 @@
     "shipping": "物流政策",
     "terms": "服务条款",
     "care": "护理说明",
-    "rights": "© {year} Feltora。羊毛手工制作。"
+    "rights": "© {year} Feltora。羊毛手工制作。",
+    "powered": "安全结算由 Stripe 提供。"
+  },
+  "search": {
+    "resultsFor": "“{query}” 的 {count} 个结果",
+    "browseTitle": "{count} 件定制作品",
+    "placeholder": "搜索宠物、肖像、迷你全身…",
+    "submit": "搜索",
+    "filters": "筛选",
+    "filterAndSort": "筛选与排序",
+    "closeFilters": "关闭筛选",
+    "sortBy": "排序",
+    "sort": {
+      "relevance": "相关度",
+      "price-asc": "价格从低到高",
+      "price-desc": "价格从高到低"
+    },
+    "inStockOnly": "仅显示有货",
+    "price": "价格",
+    "priceFrom": "最低",
+    "priceTo": "最高",
+    "apply": "应用（{count}）",
+    "empty": "没有匹配结果，换个关键词试试。"
   },
   "guide": {
     "title": "拍照指南",

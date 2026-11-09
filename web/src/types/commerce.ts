@@ -31,6 +31,9 @@ export type Product = {
   rating?: number;
   image: string;
   variants: ProductVariant[];
+  /** Extra search tokens (en/zh/ms aliases) */
+  keywords?: string[];
+  inStock?: boolean;
 };
 
 export type CartItem = {

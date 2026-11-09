@@ -30,6 +30,8 @@ export const products: Product[] = [
     priceFromUsd: 680,
     turnaroundMonths: "3–8",
     rating: 5,
+    inStock: true,
+    keywords: ["dog", "犬", "狗", "portrait", "肖像", "framed"],
     image:
       "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=1200&q=80",
     variants: [
@@ -55,6 +57,8 @@ export const products: Product[] = [
     priceFromUsd: 680,
     turnaroundMonths: "3–8",
     rating: 5,
+    inStock: true,
+    keywords: ["cat", "猫", "portrait", "肖像", "framed"],
     image:
       "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=1200&q=80",
     variants: [
@@ -80,6 +84,8 @@ export const products: Product[] = [
     priceFromUsd: 850,
     turnaroundMonths: "4–10",
     rating: 4.9,
+    inStock: true,
+    keywords: ["dog", "犬", "狗", "figurine", "miniature", "迷你", "全身", "full body"],
     image:
       "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=1200&q=80",
     variants: [
@@ -105,6 +111,8 @@ export const products: Product[] = [
     priceFromUsd: 500,
     turnaroundMonths: "3–7",
     rating: 4.9,
+    inStock: true,
+    keywords: ["dog", "犬", "狗", "mini", "miniature", "迷你", "全身", "7cm", "10cm"],
     image:
       "https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=1200&q=80",
     variants: [

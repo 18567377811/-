@@ -10,7 +10,7 @@ export function LocaleSwitcher() {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <span className="inline-flex shrink-0">
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -20,6 +20,6 @@ export function LocaleSwitcher() {
         <GlobeIcon className="h-[1.15rem] w-[1.15rem]" />
       </button>
       <RegionPicker open={open} onClose={() => setOpen(false)} />
-    </>
+    </span>
   );
 }

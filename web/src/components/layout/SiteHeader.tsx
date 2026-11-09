@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { CartBadge } from "./CartBadge";
 import { LocaleSwitcher } from "./LocaleSwitcher";
-import { BackIcon, MenuIcon } from "./HeaderIcons";
+import { BackIcon, MenuIcon, SearchIcon } from "./HeaderIcons";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 
 const DESKTOP_LINKS = [
@@ -78,6 +78,13 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-2 sm:gap-2.5">
+            <Link
+              href="/search"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f7efe6] text-ink ring-1 ring-[rgba(43,33,28,0.08)] transition hover:bg-blush/55"
+              aria-label={t("search")}
+            >
+              <SearchIcon className="h-[1.15rem] w-[1.15rem]" />
+            </Link>
             <LocaleSwitcher />
             <CartBadge />
           </div>

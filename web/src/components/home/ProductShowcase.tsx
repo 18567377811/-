@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { collections, products } from "@/data/catalog";
+import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
@@ -64,13 +65,24 @@ function BuyNow({ product }: { product: Product }) {
   );
 }
 
-function FeaturedCard({ product, index }: { product: Product; index: number }) {
+function FeaturedCard({
+  product,
+  index,
+}: {
+  product: Product;
+  index: number;
+}) {
   const t = useTranslations();
   const locale = useLocale();
   const reverse = index % 2 === 1;
+  const { ref, visible } = useRevealOnView<HTMLElement>();
 
   return (
-    <article className="overflow-hidden rounded-[1.75rem] bg-white shadow-[var(--shadow)] ring-1 ring-[color:var(--line)] transition hover:shadow-[0_16px_44px_rgba(43,33,28,0.12)]">
+    <article
+      ref={ref}
+      className={`overflow-hidden rounded-[1.75rem] bg-white shadow-[var(--shadow)] ring-1 ring-[color:var(--line)] transition hover:shadow-[0_16px_44px_rgba(43,33,28,0.12)] ${revealClass(visible, "cat-enter")}`}
+      style={visible ? { animationDelay: `${index * 120}ms` } : undefined}
+    >
       <div
         className={`grid lg:grid-cols-2 ${reverse ? "lg:[&>a:first-child]:order-2" : ""}`}
       >
@@ -120,14 +132,21 @@ function FeaturedCard({ product, index }: { product: Product; index: number }) {
   );
 }
 
-function GridCard({ product }: { product: Product }) {
+function GridCard({ product, index }: { product: Product; index: number }) {
   const t = useTranslations();
   const locale = useLocale();
+  const { ref, visible } = useRevealOnView<HTMLAnchorElement>();
 
   return (
     <Link
+      ref={ref}
       href={`/products/${product.slug}`}
-      className="group block overflow-hidden rounded-2xl bg-white shadow-[0_6px_18px_rgba(43,33,28,0.06)] ring-1 ring-[color:var(--line)] transition-[box-shadow] duration-300 hover:shadow-[0_14px_32px_rgba(43,33,28,0.14)]"
+      className={`group block overflow-hidden rounded-2xl bg-white shadow-[0_6px_18px_rgba(43,33,28,0.06)] ring-1 ring-[color:var(--line)] transition-[box-shadow] duration-300 hover:shadow-[0_14px_32px_rgba(43,33,28,0.14)] ${revealClass(visible, "list-card")}`}
+      style={
+        visible
+          ? { animationDelay: `${Math.min(index, 12) * 45}ms` }
+          : undefined
+      }
     >
       <div className="relative aspect-square overflow-hidden bg-paper">
         <Image
@@ -187,7 +206,11 @@ export function ProductShowcase() {
       {featured.length > 0 ? (
         <div className="space-y-5 sm:space-y-8">
           {featured.map((product, index) => (
-            <FeaturedCard key={product.id} product={product} index={index} />
+            <FeaturedCard
+              key={product.id}
+              product={product}
+              index={index}
+            />
           ))}
         </div>
       ) : null}
@@ -198,8 +221,8 @@ export function ProductShowcase() {
             featured.length > 0 ? "mt-6 sm:mt-10" : ""
           }`}
         >
-          {grid.map((product) => (
-            <GridCard key={product.id} product={product} />
+          {grid.map((product, index) => (
+            <GridCard key={product.id} product={product} index={index} />
           ))}
         </div>
       ) : null}

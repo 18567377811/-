@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { products } from "@/data/catalog";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
@@ -15,6 +16,8 @@ export function CartView() {
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
   const [ready, setReady] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setReady(true);
@@ -41,6 +44,29 @@ export function CartView() {
     (sum, line) => sum + line.variant.priceUsd * line.item.quantity,
     0,
   );
+
+  async function startCheckout() {
+    setError(null);
+    setCheckingOut(true);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, locale }),
+      });
+      const data = (await response.json()) as {
+        url?: string;
+        error?: string;
+      };
+      if (!response.ok || !data.url) {
+        throw new Error(data.error || t("cart.checkoutError"));
+      }
+      window.location.assign(data.url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("cart.checkoutError"));
+      setCheckingOut(false);
+    }
+  }
 
   if (!ready) {
     return (
@@ -93,22 +119,16 @@ export function CartView() {
                 </p>
               </div>
               <div className="mt-auto flex items-center justify-between gap-3">
-                <label className="flex items-center gap-2 text-sm">
-                  <span>{t("cart.quantity")}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    value={item.quantity}
-                    onChange={(event) =>
-                      updateQuantity(
-                        item.productId,
-                        item.variantId,
-                        Number(event.target.value),
-                      )
-                    }
-                    className="w-16 rounded-lg border border-line bg-white/70 px-2 py-1"
-                  />
-                </label>
+                <QuantityStepper
+                  id={`qty-${item.productId}-${item.variantId}`}
+                  label={t("cart.quantity")}
+                  value={item.quantity}
+                  min={1}
+                  max={20}
+                  onChange={(quantity) =>
+                    updateQuantity(item.productId, item.variantId, quantity)
+                  }
+                />
                 <button
                   type="button"
                   className="text-sm text-clay hover:underline"
@@ -132,8 +152,18 @@ export function CartView() {
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
           {t("cart.note")}
         </p>
-        <button type="button" className="btn-primary mt-6 w-full" disabled>
-          {t("cart.checkout")}
+        {error ? (
+          <p className="mt-3 text-sm text-clay" role="alert">
+            {error}
+          </p>
+        ) : null}
+        <button
+          type="button"
+          className="btn-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={checkingOut}
+          onClick={startCheckout}
+        >
+          {checkingOut ? t("cart.checkoutLoading") : t("cart.checkout")}
         </button>
       </aside>
     </div>

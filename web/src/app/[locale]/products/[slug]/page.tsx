@@ -29,7 +29,7 @@ export default async function ProductPage({ params }: Props) {
   const t = await getTranslations();
 
   return (
-    <div className="mx-auto grid max-w-6xl gap-6 px-3 pt-4 pb-16 sm:gap-10 sm:px-6 sm:pt-6 sm:pb-20 lg:grid-cols-2">
+    <div className="mx-auto grid max-w-6xl gap-6 px-3 pt-10 pb-16 sm:gap-10 sm:px-6 sm:pt-12 sm:pb-20 lg:grid-cols-2">
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-paper-muted shadow-[var(--shadow)] ring-1 ring-[color:var(--line)] sm:rounded-[2rem]">
         <Image
           src={product.image}

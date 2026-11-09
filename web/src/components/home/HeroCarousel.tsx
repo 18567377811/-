@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { heroSlides } from "@/data/home";
+import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
 
 function Chevron({
   direction,
@@ -39,6 +40,8 @@ export function HeroCarousel() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const { ref: heroRef, visible: heroVisible } =
+    useRevealOnView<HTMLElement>({ threshold: 0.2 });
 
   const go = useCallback((next: number) => {
     const len = heroSlides.length;
@@ -63,6 +66,7 @@ export function HeroCarousel() {
 
   return (
     <section
+      ref={heroRef}
       className="group/hero relative w-full overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -111,16 +115,24 @@ export function HeroCarousel() {
           key={heroSlides[index].id}
           className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 pt-16 sm:px-8 sm:pb-10 lg:px-12"
         >
-          <p className="reveal text-[10px] tracking-[0.22em] text-white/75 uppercase sm:text-xs">
+          <p
+            className={`${revealClass(heroVisible, "reveal")} text-[10px] tracking-[0.22em] text-white/75 uppercase sm:text-xs`}
+          >
             {t("brand.name")}
           </p>
-          <h1 className="reveal mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl">
+          <h1
+            className={`${revealClass(heroVisible, "reveal")} mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl`}
+          >
             {t(heroSlides[index].titleKey)}
           </h1>
-          <p className="reveal-delay mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base">
+          <p
+            className={`${revealClass(heroVisible, "reveal-delay")} mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base`}
+          >
             {t(heroSlides[index].bodyKey)}
           </p>
-          <p className="reveal-delay mt-3 text-xs text-[#f0d2c4] sm:text-sm">
+          <p
+            className={`${revealClass(heroVisible, "reveal-delay")} mt-3 text-xs text-[#f0d2c4] sm:text-sm`}
+          >
             {t("home.limited")}
           </p>
         </div>

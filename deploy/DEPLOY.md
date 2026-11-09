@@ -33,7 +33,8 @@ bash /var/www/feltora/deploy/workbench-update.sh
 ```
 
 脚本会：`git pull` → `npm ci` → `build` → 发布 standalone → `pm2 restart`。  
-DNS 通了以后可加证书：`bash /var/www/feltora/deploy/workbench-update.sh --ssl`
+DNS / HTTPS 已就绪后，日常更新不必带 `--ssl`。证书未装或续期失败时再跑：  
+`bash /var/www/feltora/deploy/workbench-update.sh --ssl`
 
 首次若还没有脚本，在 Workbench 执行一次：
 
@@ -128,6 +129,7 @@ cd "d:\0-Xiangmu\宠物毛毡"
 
 - 管理后台可先做在 **同一 Next 应用** 的 `/admin`（无需改 Nginx）。
 - 若日后拆成独立 Node 进程，改 `deploy/nginx/feltora.conf.template` 里预留的 `/admin/` location，再 `-InitServer` 或手动 reload Nginx。
+- **Stripe 等密钥**：放 `/var/www/feltora/shared/.env`（`workbench-update.sh` 每次发版会注入 release + PM2）。模板见 `web/.env.example`。
 
 ---
 

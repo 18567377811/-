@@ -80,6 +80,17 @@ if [[ -d public ]]; then
   cp -a public "$RELEASE_DIR/public"
 fi
 
+# 持久密钥（Stripe 等）：不进 Git，放 shared/.env，每次发版拷进 release
+SHARED_ENV="$REMOTE_ROOT/shared/.env"
+mkdir -p "$REMOTE_ROOT/shared"
+if [[ -f "$SHARED_ENV" ]]; then
+  echo "==> apply shared env → release"
+  cp -f "$SHARED_ENV" "$RELEASE_DIR/.env"
+  cp -f "$SHARED_ENV" "$RELEASE_DIR/.env.production"
+else
+  echo "WARN: missing $SHARED_ENV (Stripe checkout will return 503 until created)"
+fi
+
 # app 若是普通目录（首次误拷），ln -sfn 不会替换，必须先删掉再挂软链
 if [[ -e "$APP_LINK" && ! -L "$APP_LINK" ]]; then
   echo "==> replacing non-symlink app directory with release symlink"
@@ -93,6 +104,12 @@ readlink -f "$APP_LINK"
 # 必须 delete 再 start：仅 restart 时 PM2 可能仍占用旧 release 的真实路径
 echo "==> pm2 (recreate process on latest release)"
 export PORT="$APP_PORT" HOSTNAME=0.0.0.0 NODE_ENV=production
+if [[ -f "$SHARED_ENV" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$SHARED_ENV"
+  set +a
+fi
 pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
 cd "$APP_LINK"
 pm2 start server.js --name "$APP_NAME" --cwd "$APP_LINK"
@@ -116,6 +133,7 @@ fi
 pm2 status "$APP_NAME"
 echo ""
 echo "==> DONE"
-echo "    http://8.210.39.156"
-echo "    http://$DOMAIN  (after DNS works)"
+echo "    https://$DOMAIN"
+echo "    https://www.$DOMAIN"
+echo "    http://8.210.39.156  (IP fallback)"
 echo "    logs: pm2 logs $APP_NAME"

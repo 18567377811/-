@@ -104,3 +104,82 @@ export function CloseIcon({ className = "h-5 w-5" }: IconProps) {
     </svg>
   );
 }
+
+export function SearchIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle
+        cx="11"
+        cy="11"
+        r="6.25"
+        stroke="currentColor"
+        strokeWidth="1.55"
+      />
+      <path
+        d="M16.2 16.2 20 20"
+        stroke="currentColor"
+        strokeWidth="1.55"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function FiltersIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M5 7.5h14M8 12h8M10.5 16.5h3"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function StarIcon({ className = "h-4 w-4" }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" aria-hidden>
+      <path
+        fill="currentColor"
+        d="M12 3.6 14.5 9l5.9.5-4.5 3.8 1.4 5.7L12 16.7 6.7 19l1.4-5.7L3.6 9.5 9.5 9 12 3.6Z"
+      />
+    </svg>
+  );
+}
+
+export function ChevronIcon({
+  className = "h-4 w-4",
+  direction = "down",
+}: IconProps & { direction?: "up" | "down" }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      style={{
+        transform: direction === "up" ? "rotate(180deg)" : undefined,
+      }}
+    >
+      <path
+        d="M7 10l5 5 5-5"
+        stroke="currentColor"
+        strokeWidth="1.65"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

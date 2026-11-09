@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
@@ -11,6 +12,7 @@ export function AddToCartForm({ product }: { product: Product }) {
   const locale = useLocale();
   const addItem = useCartStore((state) => state.addItem);
   const [variantId, setVariantId] = useState(product.variants[0]?.id ?? "");
+  const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
 
   const selected = useMemo(
@@ -27,7 +29,7 @@ export function AddToCartForm({ product }: { product: Product }) {
         addItem({
           productId: product.id,
           variantId: selected.id,
-          quantity: 1,
+          quantity,
         });
         setAdded(true);
         window.setTimeout(() => setAdded(false), 1600);
@@ -57,6 +59,15 @@ export function AddToCartForm({ product }: { product: Product }) {
           })}
         </div>
       </fieldset>
+
+      <QuantityStepper
+        id={`add-${product.id}`}
+        label={t("cart.quantity")}
+        value={quantity}
+        min={1}
+        max={20}
+        onChange={setQuantity}
+      />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>

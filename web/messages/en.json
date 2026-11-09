@@ -156,9 +156,19 @@
     "empty": "Your cart is empty",
     "subtotal": "Subtotal",
     "checkout": "Checkout",
+    "checkoutLoading": "Redirecting…",
+    "checkoutError": "Could not start checkout. Please try again.",
     "remove": "Remove",
     "quantity": "Qty",
     "note": "After payment, we’ll email you a secure link to upload pet photos."
+  },
+  "checkout": {
+    "successEyebrow": "Payment received",
+    "successTitle": "Thank you — your commission is reserved.",
+    "successBody": "We’ll email next steps for photo upload shortly. Keep an eye on your inbox (and spam folder).",
+    "reference": "Reference",
+    "photoGuide": "Photo guide",
+    "backHome": "Back home"
   },
   "footer": {
     "shop": "Shop",
@@ -168,7 +178,29 @@
     "shipping": "Shipping Policy",
     "terms": "Terms of Service",
     "care": "Care Instruction",
-    "rights": "© {year} Feltora. Handmade with wool."
+    "rights": "© {year} Feltora. Handmade with wool.",
+    "powered": "Secure checkout powered by Stripe."
+  },
+  "search": {
+    "resultsFor": "{count} results for “{query}”",
+    "browseTitle": "{count} commissions",
+    "placeholder": "Search pets, portraits, miniatures…",
+    "submit": "Search",
+    "filters": "Filters",
+    "filterAndSort": "Filter and sort",
+    "closeFilters": "Close filters",
+    "sortBy": "Sort by",
+    "sort": {
+      "relevance": "Relevance",
+      "price-asc": "Price, low to high",
+      "price-desc": "Price, high to low"
+    },
+    "inStockOnly": "In stock only",
+    "price": "Price",
+    "priceFrom": "From",
+    "priceTo": "To",
+    "apply": "Apply ({count})",
+    "empty": "No pieces match this search. Try another keyword."
   },
   "guide": {
     "title": "Photo Guide",

@@ -32,7 +32,7 @@ export default async function CollectionPage({ params }: Props) {
   const items = getProductsByCollection(slug);
 
   return (
-    <div className="mx-auto max-w-6xl px-3 pt-4 pb-16 sm:px-6 sm:pt-6 sm:pb-20">
+    <div className="mx-auto max-w-6xl px-3 pt-10 pb-16 sm:px-6 sm:pt-12 sm:pb-20">
       <header className="max-w-2xl">
         <p className="text-[10px] tracking-[0.18em] text-accent uppercase">
           {locale === "zh" ? "分类" : "Collection"}
@@ -49,8 +49,8 @@ export default async function CollectionPage({ params }: Props) {
       </header>
 
       <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-10 sm:gap-4 lg:grid-cols-3">
-        {items.map((product) => (
-          <ProductCard key={product.id} product={product} />
+        {items.map((product, index) => (
+          <ProductCard key={product.id} product={product} index={index} />
         ))}
       </div>
     </div>

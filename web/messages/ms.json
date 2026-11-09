@@ -156,9 +156,19 @@
     "empty": "Troli anda kosong",
     "subtotal": "Jumlah kecil",
     "checkout": "Bayar",
+    "checkoutLoading": "Mengalihkan…",
+    "checkoutError": "Tidak dapat memulakan pembayaran. Sila cuba lagi.",
     "remove": "Buang",
     "quantity": "Knt",
     "note": "Selepas bayaran, kami akan e-mel pautan selamat untuk muat naik foto haiwan."
+  },
+  "checkout": {
+    "successEyebrow": "Bayaran diterima",
+    "successTitle": "Terima kasih — komisen anda telah ditempah.",
+    "successBody": "Kami akan e-mel langkah seterusnya untuk muat naik foto. Semak peti masuk (dan spam).",
+    "reference": "Rujukan",
+    "photoGuide": "Panduan foto",
+    "backHome": "Kembali ke laman utama"
   },
   "footer": {
     "shop": "Kedai",
@@ -168,7 +178,29 @@
     "shipping": "Dasar Penghantaran",
     "terms": "Terma Perkhidmatan",
     "care": "Arahan Penjagaan",
-    "rights": "© {year} Feltora. Handmade dengan bulu."
+    "rights": "© {year} Feltora. Handmade dengan bulu.",
+    "powered": "Pembayaran selamat dikuasakan oleh Stripe."
+  },
+  "search": {
+    "resultsFor": "{count} keputusan untuk “{query}”",
+    "browseTitle": "{count} komisen",
+    "placeholder": "Cari haiwan, potret, miniatur…",
+    "submit": "Cari",
+    "filters": "Penapis",
+    "filterAndSort": "Tapis dan susun",
+    "closeFilters": "Tutup penapis",
+    "sortBy": "Susun mengikut",
+    "sort": {
+      "relevance": "Perkaitan",
+      "price-asc": "Harga, rendah ke tinggi",
+      "price-desc": "Harga, tinggi ke rendah"
+    },
+    "inStockOnly": "Stok sahaja",
+    "price": "Harga",
+    "priceFrom": "Dari",
+    "priceTo": "Hingga",
+    "apply": "Guna ({count})",
+    "empty": "Tiada hasil. Cuba kata kunci lain."
   },
   "guide": {
     "title": "Panduan Foto",
