@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { heroSlides } from "@/data/home";
 
@@ -20,7 +20,11 @@ function Chevron({
       aria-hidden="true"
     >
       <path
-        d={direction === "left" ? "M15 5.5 8.5 12 15 18.5" : "M9 5.5 15.5 12 9 18.5"}
+        d={
+          direction === "left"
+            ? "M15 5.5 8.5 12 15 18.5"
+            : "M9 5.5 15.5 12 9 18.5"
+        }
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
@@ -34,10 +38,19 @@ export function HeroCarousel() {
   const t = useTranslations();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const touchStartX = useRef<number | null>(null);
 
   const go = useCallback((next: number) => {
     const len = heroSlides.length;
     setIndex(((next % len) + len) % len);
+  }, []);
+
+  // Preload all slide images so fades stay smooth
+  useEffect(() => {
+    heroSlides.forEach((slide) => {
+      const img = new window.Image();
+      img.src = slide.image;
+    });
   }, []);
 
   useEffect(() => {
@@ -53,8 +66,27 @@ export function HeroCarousel() {
       className="group/hero relative w-full overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={(event) => {
+        touchStartX.current = event.touches[0]?.clientX ?? null;
+        setPaused(true);
+      }}
+      onTouchEnd={(event) => {
+        const start = touchStartX.current;
+        touchStartX.current = null;
+        setPaused(false);
+        if (start == null) return;
+        const end = event.changedTouches[0]?.clientX;
+        if (end == null) return;
+        const delta = end - start;
+        if (Math.abs(delta) < 42) return;
+        go(index + (delta < 0 ? 1 : -1));
+      }}
+      onTouchCancel={() => {
+        touchStartX.current = null;
+        setPaused(false);
+      }}
     >
-      <div className="relative aspect-[4/3] w-full sm:aspect-[16/7] lg:aspect-[21/8]">
+      <div className="relative aspect-[4/3] w-full touch-pan-y sm:aspect-[16/7] lg:aspect-[21/8]">
         {heroSlides.map((slide, i) => (
           <div
             key={slide.id}
@@ -67,7 +99,7 @@ export function HeroCarousel() {
               src={slide.image}
               alt=""
               fill
-              priority={i === 0}
+              priority={i === 0 || i === index}
               className="object-cover"
               sizes="100vw"
             />
@@ -75,17 +107,20 @@ export function HeroCarousel() {
           </div>
         ))}
 
-        <div className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 pt-16 sm:px-8 sm:pb-10 lg:px-12">
-          <p className="text-[10px] tracking-[0.22em] text-white/75 uppercase sm:text-xs">
+        <div
+          key={heroSlides[index].id}
+          className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 pt-16 sm:px-8 sm:pb-10 lg:px-12"
+        >
+          <p className="reveal text-[10px] tracking-[0.22em] text-white/75 uppercase sm:text-xs">
             {t("brand.name")}
           </p>
-          <h1 className="mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl">
+          <h1 className="reveal mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl">
             {t(heroSlides[index].titleKey)}
           </h1>
-          <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base">
+          <p className="reveal-delay mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base">
             {t(heroSlides[index].bodyKey)}
           </p>
-          <p className="mt-3 text-xs text-[#f0d2c4] sm:text-sm">
+          <p className="reveal-delay mt-3 text-xs text-[#f0d2c4] sm:text-sm">
             {t("home.limited")}
           </p>
         </div>

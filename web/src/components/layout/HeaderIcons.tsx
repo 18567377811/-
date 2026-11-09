@@ -21,6 +21,26 @@ export function MenuIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+/** Soft cream-style back chevron for secondary pages */
+export function BackIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <path
+        d="M14.75 5.75 8.5 12l6.25 6.25"
+        stroke="currentColor"
+        strokeWidth="1.65"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function GlobeIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg
