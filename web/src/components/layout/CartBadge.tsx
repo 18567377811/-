@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCartStore } from "@/store/cart";
+import { CartIcon } from "./HeaderIcons";
 
 export function CartBadge() {
   const t = useTranslations("nav");
@@ -15,13 +16,20 @@ export function CartBadge() {
     setReady(true);
   }, []);
 
+  const display = ready ? count : 0;
+
   return (
     <Link
       href="/cart"
-      className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white/80 px-2.5 py-1.5 text-xs font-medium transition hover:bg-blush/40 sm:gap-2 sm:px-3 sm:text-sm"
+      className="relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-[#f7efe6] text-ink ring-1 ring-[rgba(43,33,28,0.08)] transition hover:bg-blush/55"
+      aria-label={`${t("cart")}${display > 0 ? ` ${display}` : ""}`}
     >
-      <span>{t("cart")}</span>
-      <span className="tabular-nums text-accent">{ready ? count : 0}</span>
+      <CartIcon className="h-[1.15rem] w-[1.15rem]" />
+      {display > 0 ? (
+        <span className="absolute -right-0.5 -top-0.5 flex h-[1.05rem] min-w-[1.05rem] items-center justify-center rounded-full bg-[#e24b4b] px-1 text-[10px] font-semibold leading-none text-white shadow-sm">
+          {display > 99 ? "99+" : display}
+        </span>
+      ) : null}
     </Link>
   );
 }

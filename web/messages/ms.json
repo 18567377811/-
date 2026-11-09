@@ -13,16 +13,22 @@
     "miniature": "Miniatur",
     "diaries": "Diari Studio",
     "photoGuide": "Panduan Foto",
+    "makeGuide": "Panduan Buatan",
     "about": "Tentang Kami",
     "contact": "Hubungi",
     "cart": "Troli",
-    "search": "Cari"
+    "search": "Cari",
+    "menu": "Menu",
+    "closeMenu": "Tutup menu",
+    "openRegion": "Pilih negara / wilayah"
   },
   "locale": {
     "label": "Bahasa",
     "en": "English",
     "ms": "Bahasa Melayu",
-    "zh": "简体中文"
+    "zh": "简体中文",
+    "countryTitle": "Country",
+    "close": "Tutup"
   },
   "home": {
     "heroTitle": "Semangat mereka, diabadikan dalam bulu.",

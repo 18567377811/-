@@ -6,4 +6,5 @@ $DeployConfig = @{
   Domain     = "thestoryofawool.me"
   AppPort    = 3000
   AppName    = "feltora"
+  GitUrl     = "https://github.com/18567377811/-.git"
 }

@@ -11,7 +11,7 @@ APP_PORT="${APP_PORT:-3000}"
 APP_NAME="${APP_NAME:-feltora}"
 REMOTE_ROOT="${REMOTE_ROOT:-/var/www/feltora}"
 SRC_DIR="${SRC_DIR:-/var/www/feltora-src}"
-GIT_URL="${GIT_URL:-https://gitee.com/dzy0801/pet-felt.git}"
+GIT_URL="${GIT_URL:-https://github.com/18567377811/-.git}"
 BRANCH="${BRANCH:-}"
 ENABLE_SSL=0
 

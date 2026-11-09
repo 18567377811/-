@@ -1,12 +1,12 @@
 # Feltora 部署手册（香港 ECS + 域名 thestoryofawool.me）
 
-面向：**本机改完 → 推 Gitee → 服务器一键更新**；全栈 Next.js（站点 + 日后 `/admin` / API），海外用户。
+面向：**本机改完 → 推 GitHub → Workbench 一键更新**；全栈 Next.js（站点 + 日后 `/admin` / API），海外用户。
 
 | 项 | 值 |
 |----|-----|
 | 服务器 | `8.210.39.156`（中国香港） |
 | 域名 | `thestoryofawool.me` |
-| 代码仓库 | https://gitee.com/dzy0801/pet-felt.git |
+| 代码仓库 | https://github.com/18567377811/-.git |
 | 应用目录 | `/var/www/feltora` |
 | 推荐方式 | 阿里云 Workbench + `workbench-update.sh`（本机 SSH 不通时用这个） |
 
@@ -19,7 +19,7 @@
 本机开发验证通过后：
 
 ```powershell
-# 本机：把改动推到 Gitee
+# 本机：把改动推到 GitHub
 cd "d:\0-Xiangmu\宠物毛毡"
 git add -A
 git commit -m "update site"
@@ -39,15 +39,13 @@ DNS 通了以后可加证书：`bash /var/www/feltora/deploy/workbench-update.sh
 
 ```bash
 mkdir -p /var/www/feltora/deploy
-curl -fsSL "https://gitee.com/dzy0801/pet-felt/raw/master/deploy/workbench-update.sh" \
-  -o /var/www/feltora/deploy/workbench-update.sh \
-  || curl -fsSL "https://gitee.com/dzy0801/pet-felt/raw/main/deploy/workbench-update.sh" \
+curl -fsSL "https://raw.githubusercontent.com/18567377811/-/main/deploy/workbench-update.sh" \
   -o /var/www/feltora/deploy/workbench-update.sh
 chmod +x /var/www/feltora/deploy/workbench-update.sh
 bash /var/www/feltora/deploy/workbench-update.sh
 ```
 
-（若仓库是私有的，把 `GIT_URL` 换成带令牌的地址，或先在服务器 `git clone` 登录一次。）
+（香港 ECS 访问不了 Gitee，请用 GitHub。私有库把 `GIT_URL` 换成带 token 的地址。）
 
 ---
 
