@@ -72,7 +72,7 @@ RELEASE_DIR="$REMOTE_ROOT/releases/$RELEASE_ID"
 APP_LINK="$REMOTE_ROOT/app"
 
 echo "==> release $RELEASE_ID"
-mkdir -p "$RELEASE_DIR" "$REMOTE_ROOT/uploads" "$REMOTE_ROOT/logs" "$REMOTE_ROOT/deploy"
+mkdir -p "$RELEASE_DIR" "$REMOTE_ROOT/uploads" "$REMOTE_ROOT/logs" "$REMOTE_ROOT/deploy" "$REMOTE_ROOT/releases"
 cp -a .next/standalone/. "$RELEASE_DIR/"
 mkdir -p "$RELEASE_DIR/.next"
 cp -a .next/static "$RELEASE_DIR/.next/static"
@@ -80,7 +80,14 @@ if [[ -d public ]]; then
   cp -a public "$RELEASE_DIR/public"
 fi
 
+# app 若是普通目录（首次误拷），ln -sfn 不会替换，必须先删掉再挂软链
+if [[ -e "$APP_LINK" && ! -L "$APP_LINK" ]]; then
+  echo "==> replacing non-symlink app directory with release symlink"
+  rm -rf "$APP_LINK"
+fi
 ln -sfn "$RELEASE_DIR" "$APP_LINK"
+ls -la "$APP_LINK"
+readlink -f "$APP_LINK"
 
 # ---------- PM2 ----------
 # 必须 delete 再 start：仅 restart 时 PM2 可能仍占用旧 release 的真实路径
