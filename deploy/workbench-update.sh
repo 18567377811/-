@@ -83,14 +83,12 @@ fi
 ln -sfn "$RELEASE_DIR" "$APP_LINK"
 
 # ---------- PM2 ----------
-echo "==> pm2"
-cd "$APP_LINK"
+# 必须 delete 再 start：仅 restart 时 PM2 可能仍占用旧 release 的真实路径
+echo "==> pm2 (recreate process on latest release)"
 export PORT="$APP_PORT" HOSTNAME=0.0.0.0 NODE_ENV=production
-if pm2 describe "$APP_NAME" >/dev/null 2>&1; then
-  pm2 restart "$APP_NAME" --update-env
-else
-  pm2 start server.js --name "$APP_NAME" --cwd "$APP_LINK"
-fi
+pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
+cd "$APP_LINK"
+pm2 start server.js --name "$APP_NAME" --cwd "$APP_LINK"
 pm2 save
 
 # 只保留最近 5 个版本
