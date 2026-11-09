@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "Feltora — 手工羊毛宠物肖像与微缩",
+    "description": "根据照片定制的针毡宠物肖像与全身微缩，面向全球宠爱者。"
+  },
+  "brand": {
+    "name": "Feltora",
+    "tagline": "为你的宠物手工制作艺术级复刻"
+  },
+  "nav": {
+    "home": "首页",
+    "portrait": "肖像",
+    "miniature": "迷你全身",
+    "diaries": "工作室手记",
+    "photoGuide": "拍照指南",
+    "about": "关于我们",
+    "contact": "联系",
+    "cart": "购物车",
+    "search": "搜索"
+  },
+  "locale": {
+    "label": "语言",
+    "en": "English",
+    "ms": "Bahasa Melayu",
+    "zh": "简体中文"
+  },
+  "home": {
+    "heroTitle": "把它们的神韵，永远毡进羊毛里。",
+    "heroBody": "根据宠物照片定制的羊毛肖像与微缩——一眼就能认出是它。",
+    "heroCta": "浏览肖像",
+    "heroSecondary": "浏览迷你全身",
+    "limited": "每月仅承接少量定制名额，像对待家人一样慢慢做。",
+    "featuredTitle": "招牌定制",
+    "categoryEyebrow": "逛分类",
+    "categoryTitle": "从亲近它们的方式开始",
+    "categoryHints": {
+      "portrait": "装裱肖像",
+      "miniature": "可抱可摆",
+      "guide": "怎么拍更好",
+      "about": "认识工作室"
+    },
+    "productsEyebrow": "定制作品",
+    "productsTitle": "为它留下一份温度",
+    "viewFeatured": "大图",
+    "viewGrid": "双列",
+    "buyNow": "立即购买",
+    "slides": {
+      "bond": {
+        "title": "它不只是宠物，是家人。",
+        "body": "把日常的陪伴，做成可以触摸的温柔纪念。"
+      },
+      "craft": {
+        "title": "羊毛里的温度，手工里的耐心。",
+        "body": "每一缕毛色与眼神，都按你家的它来还原。"
+      },
+      "keep": {
+        "title": "一眼认出，是它回来了。",
+        "body": "肖像与迷你全身，适合纪念日、生日与长久珍藏。"
+      }
+    },
+    "processTitle": "一起把性格做活",
+    "processBody": "每一件 Feltora 作品都是协作：照片、手工、预览，再仔细收尾。",
+    "faqTitle": "常见问题"
+  },
+  "process": {
+    "photo": {
+      "title": "提交照片",
+      "body": "付款后请上传清晰照片与一段宠物故事。我们会一起挑选最佳参考图。"
+    },
+    "structure": {
+      "title": "羊毛骨架",
+      "body": "先做出稳固的羊毛基底，保证比例与表情准确。"
+    },
+    "details": {
+      "title": "眼睛、鼻子与毛色",
+      "body": "手绘眼睛、塑形五官，再一根根混色植毛，做出层次与真实感。"
+    },
+    "preview": {
+      "title": "预览与确认",
+      "body": "发货前会发送预览。欢迎提出小幅调整。"
+    }
+  },
+  "faq": {
+    "ship": {
+      "q": "可以寄到海外吗？",
+      "a": "可以，我们支持全球配送；完成后通常再需 2–4 周物流时间。"
+    },
+    "time": {
+      "q": "订单大概多久完成？",
+      "a": "手工定制通常需要 3–10 个月，视作品类型而定。请参考各商品页的预估工期。"
+    },
+    "made": {
+      "q": "Feltora 作品如何制作？",
+      "a": "每件作品都用天然羊毛针毡手工完成。鼻子与嘴巴另行塑形；全身款内置铁丝骨架，方便调整爪子与尾巴姿态。"
+    },
+    "happy": {
+      "q": "如何保证我满意？",
+      "a": "制作过程中会发送进度照片与最终预览。如有疑虑，我们会沟通并微调，力求神似。"
+    }
+  },
+  "collections": {
+    "portrait": {
+      "name": "肖像",
+      "description": "装裱羊毛肖像，细致还原宠物神情。"
+    },
+    "miniature": {
+      "name": "迷你全身",
+      "description": "针毡全身微缩——小巧却有强烈存在感的纪念物。"
+    }
+  },
+  "products": {
+    "from": "起",
+    "turnaround": "预估工期",
+    "months": "个月",
+    "addToCart": "加入购物车",
+    "chooseVariant": "选择规格",
+    "continueShopping": "继续购物",
+    "variants": {
+      "solidBicolor": "单色 / 双色",
+      "complexCoat": "复杂毛色",
+      "tabbyTortie": "虎斑 / 三花",
+      "standard": "标准款",
+      "poseablePaws": "可调姿态爪子升级",
+      "size7to10": "7–10 cm"
+    },
+    "portraitDog": {
+      "name": "装裱宠物肖像 — 狗狗",
+      "summary": "装裱羊毛肖像，定格你家狗狗独一无二的脸。",
+      "description": "根据照片层层植毛，手绘眼睛与五官。适合纪念与长久珍藏。"
+    },
+    "portraitCat": {
+      "name": "装裱宠物肖像 — 猫咪",
+      "summary": "装裱羊毛肖像，贴近猫咪的眼神与花纹。",
+      "description": "从单色到复杂虎斑，我们仔细混色，让作品一眼就能认出是它。"
+    },
+    "fullBody": {
+      "name": "全身微缩",
+      "summary": "立体微缩，连姿态与性格一起留下。",
+      "description": "针毡覆盖支撑骨架。可选可调爪子，收到后也能微调站姿。"
+    },
+    "miniFullBody": {
+      "name": "迷你全身微缩（7–10 cm）",
+      "summary": "更小的全身纪念款，同样手工细节。",
+      "description": "适合桌面、书架与随身纪念——仍然一眼就是你家的它。"
+    }
+  },
+  "cart": {
+    "title": "你的购物车",
+    "empty": "购物车是空的",
+    "subtotal": "小计",
+    "checkout": "去结算",
+    "remove": "移除",
+    "quantity": "数量",
+    "note": "付款后我们会发邮件，附上安全链接供你上传宠物照片。"
+  },
+  "footer": {
+    "shop": "选购",
+    "info": "信息",
+    "policies": "政策",
+    "refund": "退款政策",
+    "shipping": "物流政策",
+    "terms": "服务条款",
+    "care": "护理说明",
+    "rights": "© {year} Feltora。羊毛手工制作。"
+  },
+  "guide": {
+    "title": "拍照指南",
+    "intro": "清晰的照片能帮助我们更准确地还原。尽量提供多个角度。",
+    "tips": {
+      "light": "使用自然光，避免重度滤镜。",
+      "front": "提供一张清晰的正面脸部照片。",
+      "side": "补充侧面，方便还原耳朵、吻部与体态。",
+      "color": "用多张照片展示真实毛色。",
+      "story": "简单写一点性格，有助于把握表情。"
+    }
+  },
+  "about": {
+    "title": "关于 Feltora",
+    "body": "Feltora 是专注手工羊毛宠物复刻的工作室。我们慢慢做、一件一件做，让每件作品都足够私人、足够像它。"
+  },
+  "contact": {
+    "title": "联系我们",
+    "body": "关于定制、工期或参考照片的问题，欢迎来信。",
+    "email": "hello@feltora.example",
+    "cta": "发邮件给工作室"
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "Feltora — Handmade Wool Replicas of Your Pet",
+    "description": "Custom needle-felted pet portraits and miniatures, crafted by hand for pet lovers worldwide."
+  },
+  "brand": {
+    "name": "Feltora",
+    "tagline": "Handmade artistic replicas of your pet"
+  },
+  "nav": {
+    "home": "Home",
+    "portrait": "Portrait",
+    "miniature": "Miniature",
+    "diaries": "Studio Diaries",
+    "photoGuide": "Photo Guide",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "search": "Search"
+  },
+  "locale": {
+    "label": "Language",
+    "en": "English",
+    "ms": "Bahasa Melayu",
+    "zh": "简体中文"
+  },
+  "home": {
+    "heroTitle": "Their spirit, felted forever.",
+    "heroBody": "Custom wool portraits and miniatures made from your pet’s photos — recognizable at a glance.",
+    "heroCta": "Shop portraits",
+    "heroSecondary": "Shop miniatures",
+    "limited": "Only a handful of commissions accepted each month.",
+    "featuredTitle": "Signature commissions",
+    "categoryEyebrow": "Browse",
+    "categoryTitle": "Find your starting place",
+    "categoryHints": {
+      "portrait": "Framed portraits",
+      "miniature": "Full-body keepsakes",
+      "guide": "Photo tips",
+      "about": "Our studio"
+    },
+    "productsEyebrow": "Commissions",
+    "productsTitle": "Something to keep close",
+    "viewFeatured": "Featured",
+    "viewGrid": "Grid",
+    "buyNow": "Buy now",
+    "slides": {
+      "bond": {
+        "title": "Remembered like family.",
+        "body": "Every piece begins with the warmth you share with your pet."
+      },
+      "craft": {
+        "title": "A familiar face in wool.",
+        "body": "Needle felting, hand-painted eyes, and sculpted features — made to feel like them."
+      },
+      "keep": {
+        "title": "A keepsake you can hold.",
+        "body": "From photos to finishing, we walk each step with you."
+      }
+    },
+    "processTitle": "Bring their personality to life — together",
+    "processBody": "Every Feltora piece is a collaboration: photos, craft, preview, and careful finishing.",
+    "faqTitle": "FAQ"
+  },
+  "process": {
+    "photo": {
+      "title": "Photo submission",
+      "body": "After checkout, share clear photos and a short story of your pet. We’ll help choose the best references."
+    },
+    "structure": {
+      "title": "Wool structure",
+      "body": "We build a sturdy wool base so proportions and expression stay true."
+    },
+    "details": {
+      "title": "Eyes, nose & fur",
+      "body": "Hand-painted eyes, sculpted features, and fiber mixed strand by strand for lifelike depth."
+    },
+    "preview": {
+      "title": "Preview & review",
+      "body": "You’ll receive a preview before shipping. Minor adjustments are welcome."
+    }
+  },
+  "faq": {
+    "ship": {
+      "q": "Do you ship overseas?",
+      "a": "Yes. We ship worldwide, with delivery usually taking 2–4 weeks after completion."
+    },
+    "time": {
+      "q": "How long does an order take?",
+      "a": "Handmade commissions typically take 3–10 months, depending on the piece. Check each product page for estimates."
+    },
+    "made": {
+      "q": "How are Feltora pieces made?",
+      "a": "Each piece is needle-felted by hand with natural wool. Noses and mouths are sculpted; full-body figures include a wireframe for poseable paws and tails."
+    },
+    "happy": {
+      "q": "How do you ensure I’m happy?",
+      "a": "We share progress photos and a final preview. We’ll discuss adjustments so the likeness feels right."
+    }
+  },
+  "collections": {
+    "portrait": {
+      "name": "Portrait",
+      "description": "Framed wool-painted portraits that capture your pet’s expression with museum-level care."
+    },
+    "miniature": {
+      "name": "Miniature",
+      "description": "Full-body felted figurines — compact keepsakes with remarkable presence."
+    }
+  },
+  "products": {
+    "from": "From",
+    "turnaround": "Estimated turnaround",
+    "months": "months",
+    "addToCart": "Add to cart",
+    "chooseVariant": "Choose option",
+    "continueShopping": "Continue shopping",
+    "variants": {
+      "solidBicolor": "Solid & bicolor",
+      "complexCoat": "Complex coat",
+      "tabbyTortie": "Tabby & tortie",
+      "standard": "Standard",
+      "poseablePaws": "Poseable paws upgrade",
+      "size7to10": "7–10 cm"
+    },
+    "portraitDog": {
+      "name": "Framed Pet Portrait — Dog",
+      "summary": "A framed wool portrait that captures your dog’s unmistakable face.",
+      "description": "Built fiber by fiber from your photos, with hand-finished eyes and features. Ideal for memorials and forever keepsakes."
+    },
+    "portraitCat": {
+      "name": "Framed Pet Portrait — Cat",
+      "summary": "A framed wool portrait tailored to your cat’s gaze and coat pattern.",
+      "description": "From solid coats to intricate tabbies, we mix wool tones carefully so the likeness feels instantly familiar."
+    },
+    "fullBody": {
+      "name": "Full Body Figurine",
+      "summary": "A sculptural miniature of your pet, pose and personality included.",
+      "description": "Needle-felted over a supportive frame. Optional poseable paws let you adjust the stance after delivery."
+    },
+    "miniFullBody": {
+      "name": "Mini Full Body Figurine (7–10 cm)",
+      "summary": "A smaller full-body keepsake with the same handcrafted detail.",
+      "description": "Perfect for desks, shelves, and travel-sized memories — still unmistakably your pet."
+    }
+  },
+  "cart": {
+    "title": "Your shopping cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "quantity": "Qty",
+    "note": "After payment, we’ll email you a secure link to upload pet photos."
+  },
+  "footer": {
+    "shop": "Shop",
+    "info": "Info",
+    "policies": "Policies",
+    "refund": "Refund Policy",
+    "shipping": "Shipping Policy",
+    "terms": "Terms of Service",
+    "care": "Care Instruction",
+    "rights": "© {year} Feltora. Handmade with wool."
+  },
+  "guide": {
+    "title": "Photo Guide",
+    "intro": "Clear photos help us recreate your pet accurately. Share several angles when you can.",
+    "tips": {
+      "light": "Use natural daylight; avoid heavy filters.",
+      "front": "Include a clear front-facing portrait of the face.",
+      "side": "Add a side profile for ears, muzzle, and posture.",
+      "color": "Show true coat colors in more than one photo.",
+      "story": "A short note about personality helps with expression."
+    }
+  },
+  "about": {
+    "title": "About Feltora",
+    "body": "Feltora is a studio dedicated to handmade wool replicas of beloved pets. We work slowly, commission by commission, so every piece feels personal and true."
+  },
+  "contact": {
+    "title": "Contact",
+    "body": "Questions about commissions, timing, or photo references? Send us a note.",
+    "email": "hello@feltora.example",
+    "cta": "Email the studio"
+  }
+}

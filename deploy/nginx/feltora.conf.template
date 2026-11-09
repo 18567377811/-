@@ -1,0 +1,42 @@
+# Feltora / thestoryofawool.me
+# 由 server-setup.sh 写入；HTTPS 由 certbot 自动追加
+
+upstream feltora_app {
+    server 127.0.0.1:__APP_PORT__;
+    keepalive 32;
+}
+
+# 以后管理后台 / API 拆进程时，在这里加 upstream 即可，例如：
+# upstream feltora_admin { server 127.0.0.1:3001; }
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name __DOMAIN__ www.__DOMAIN__;
+
+    client_max_body_size 50m;
+
+    # 站点 + 未来 Next.js Route Handlers /admin
+    location / {
+        proxy_pass http://feltora_app;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+        proxy_read_timeout 120s;
+    }
+
+    # 预留：独立后台进程时取消注释
+    # location /admin/ {
+    #     proxy_pass http://feltora_admin;
+    #     proxy_http_version 1.1;
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    # }
+}

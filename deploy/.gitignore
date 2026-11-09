@@ -1,0 +1,4 @@
+.release/
+.release.tgz
+*.tgz
+.env.local

@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "title": "Feltora — Replika Bulu Handmade Haiwan Kesayangan Anda",
+    "description": "Potret dan miniatur haiwan kesayangan dari bulu felt, dibuat tangan untuk pencinta haiwan di seluruh dunia."
+  },
+  "brand": {
+    "name": "Feltora",
+    "tagline": "Replika artistik handmade haiwan kesayangan anda"
+  },
+  "nav": {
+    "home": "Laman Utama",
+    "portrait": "Potret",
+    "miniature": "Miniatur",
+    "diaries": "Diari Studio",
+    "photoGuide": "Panduan Foto",
+    "about": "Tentang Kami",
+    "contact": "Hubungi",
+    "cart": "Troli",
+    "search": "Cari"
+  },
+  "locale": {
+    "label": "Bahasa",
+    "en": "English",
+    "ms": "Bahasa Melayu",
+    "zh": "简体中文"
+  },
+  "home": {
+    "heroTitle": "Semangat mereka, diabadikan dalam bulu.",
+    "heroBody": "Potret dan miniatur bulu khas dibuat daripada foto haiwan anda — dikenali sekelip mata.",
+    "heroCta": "Lihat potret",
+    "heroSecondary": "Lihat miniatur",
+    "limited": "Hanya beberapa komisen diterima setiap bulan.",
+    "featuredTitle": "Komisen signature",
+    "categoryEyebrow": "Jelajah",
+    "categoryTitle": "Mulakan di sini",
+    "categoryHints": {
+      "portrait": "Potret berbingkai",
+      "miniature": "Cenderamata badan penuh",
+      "guide": "Tip foto",
+      "about": "Studio kami"
+    },
+    "productsEyebrow": "Komisen",
+    "productsTitle": "Sesuatu untuk dikenang",
+    "viewFeatured": "Besar",
+    "viewGrid": "Dua lajur",
+    "buyNow": "Beli sekarang",
+    "slides": {
+      "bond": {
+        "title": "Dikenang seperti keluarga.",
+        "body": "Setiap karya bermula daripada kehangatan antara anda dan haiwan kesayangan."
+      },
+      "craft": {
+        "title": "Wajah yang dikenali dalam bulu.",
+        "body": "Needle felting, mata dilukis tangan, dan ciri diukir — supaya terasa seperti mereka."
+      },
+      "keep": {
+        "title": "Cenderamata yang boleh dipegang.",
+        "body": "Dari foto hingga kemasan, kami temani setiap langkah."
+      }
+    },
+    "processTitle": "Hidupkan personaliti mereka — bersama",
+    "processBody": "Setiap karya Feltora adalah kolaborasi: foto, kraftangan, pratonton, dan kemasan teliti.",
+    "faqTitle": "Soalan lazim"
+  },
+  "process": {
+    "photo": {
+      "title": "Hantar foto",
+      "body": "Selepas pembayaran, kongsi foto jelas dan sedikit cerita tentang haiwan anda. Kami bantu pilih rujukan terbaik."
+    },
+    "structure": {
+      "title": "Struktur bulu",
+      "body": "Kami bina asas bulu yang kukuh supaya proporsi dan ekspresi kekal tepat."
+    },
+    "details": {
+      "title": "Mata, hidung & bulu",
+      "body": "Mata dilukis tangan, ciri diukir, dan serat digaul helai demi helai untuk kedalaman nyata."
+    },
+    "preview": {
+      "title": "Pratonton & semakan",
+      "body": "Anda akan terima pratonton sebelum penghantaran. Penyesuaian kecil dialu-alukan."
+    }
+  },
+  "faq": {
+    "ship": {
+      "q": "Adakah anda menghantar ke luar negara?",
+      "a": "Ya. Kami menghantar ke seluruh dunia, biasanya 2–4 minggu selepas siap."
+    },
+    "time": {
+      "q": "Berapa lama pesanan mengambil masa?",
+      "a": "Komisen handmade biasanya 3–10 bulan, bergantung pada karya. Semak anggaran di halaman produk."
+    },
+    "made": {
+      "q": "Bagaimana karya Feltora dibuat?",
+      "a": "Setiap karya dibuat dengan teknik needle felting menggunakan bulu semula jadi. Hidung dan mulut diukir; figurin badan penuh mempunyai rangka wayar untuk kaki dan ekor yang boleh digayakan."
+    },
+    "happy": {
+      "q": "Bagaimana anda pastikan saya berpuas hati?",
+      "a": "Kami kongsi foto kemajuan dan pratonton akhir. Kami bincang penyesuaian supaya rupa benar-benar serupa."
+    }
+  },
+  "collections": {
+    "portrait": {
+      "name": "Potret",
+      "description": "Potret bulu berbingkai yang menangkap ekspresi haiwan anda dengan penuh teliti."
+    },
+    "miniature": {
+      "name": "Miniatur",
+      "description": "Figurin badan penuh dari felt — cenderamata padat dengan kehadiran yang kuat."
+    }
+  },
+  "products": {
+    "from": "Dari",
+    "turnaround": "Anggaran masa siap",
+    "months": "bulan",
+    "addToCart": "Tambah ke troli",
+    "chooseVariant": "Pilih pilihan",
+    "continueShopping": "Terus membeli",
+    "variants": {
+      "solidBicolor": "Solid & dua warna",
+      "complexCoat": "Corak bulu kompleks",
+      "tabbyTortie": "Tabby & tortie",
+      "standard": "Standard",
+      "poseablePaws": "Naik taraf kaki boleh digayakan",
+      "size7to10": "7–10 cm"
+    },
+    "portraitDog": {
+      "name": "Potret Haiwan Berbingkai — Anjing",
+      "summary": "Potret bulu berbingkai yang menangkap wajah unik anjing anda.",
+      "description": "Dibina serat demi serat daripada foto anda, dengan mata dan ciri yang disiapkan tangan. Sesuai untuk memorial dan kenangan abadi."
+    },
+    "portraitCat": {
+      "name": "Potret Haiwan Berbingkai — Kucing",
+      "summary": "Potret bulu berbingkai disesuaikan dengan pandangan dan corak bulu kucing anda.",
+      "description": "Dari bulu solid hingga tabby rumit, kami campur nada bulu dengan teliti supaya rupa terus dikenali."
+    },
+    "fullBody": {
+      "name": "Figurin Badan Penuh",
+      "summary": "Miniatur arca haiwan anda, termasuk pose dan personaliti.",
+      "description": "Needle-felted atas rangka sokongan. Pilihan kaki boleh digayakan membolehkan anda ubah sikap selepas diterima."
+    },
+    "miniFullBody": {
+      "name": "Figurin Badan Penuh Mini (7–10 cm)",
+      "summary": "Cenderamata badan penuh yang lebih kecil dengan perincian handmade yang sama.",
+      "description": "Sesuai untuk meja, rak, dan kenangan saiz perjalanan — tetap nyata seperti haiwan anda."
+    }
+  },
+  "cart": {
+    "title": "Troli belanja anda",
+    "empty": "Troli anda kosong",
+    "subtotal": "Jumlah kecil",
+    "checkout": "Bayar",
+    "remove": "Buang",
+    "quantity": "Knt",
+    "note": "Selepas bayaran, kami akan e-mel pautan selamat untuk muat naik foto haiwan."
+  },
+  "footer": {
+    "shop": "Kedai",
+    "info": "Maklumat",
+    "policies": "Dasar",
+    "refund": "Dasar Bayaran Balik",
+    "shipping": "Dasar Penghantaran",
+    "terms": "Terma Perkhidmatan",
+    "care": "Arahan Penjagaan",
+    "rights": "© {year} Feltora. Handmade dengan bulu."
+  },
+  "guide": {
+    "title": "Panduan Foto",
+    "intro": "Foto yang jelas membantu kami mencipta semula haiwan anda dengan tepat. Kongsi beberapa sudut jika boleh.",
+    "tips": {
+      "light": "Guna cahaya semula jadi; elak penapis berat.",
+      "front": "Sertakan potret muka dari depan yang jelas.",
+      "side": "Tambah profil sisi untuk telinga, muncung, dan postur.",
+      "color": "Tunjukkan warna bulu sebenar dalam lebih daripada satu foto.",
+      "story": "Nota pendek tentang personaliti membantu ekspresi."
+    }
+  },
+  "about": {
+    "title": "Tentang Feltora",
+    "body": "Feltora ialah studio yang menumpukan replika bulu handmade haiwan kesayangan. Kami bekerja perlahan, komisen demi komisen, supaya setiap karya terasa peribadi dan benar."
+  },
+  "contact": {
+    "title": "Hubungi",
+    "body": "Soalan tentang komisen, masa, atau rujukan foto? Hantar mesej kepada kami.",
+    "email": "hello@feltora.example",
+    "cta": "E-mel studio"
+  }
+}

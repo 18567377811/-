@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+:root {
+  /* Warm family / pet-bond palette — soft wool & hearth, not B&W */
+  --paper: #fff9f4;
+  --paper-muted: #f3e6dc;
+  --ink: #2b211c;
+  --ink-soft: #6d5a50;
+  --accent: #9a5b45;
+  --accent-deep: #7d4534;
+  --blush: #f0d2c4;
+  --honey: #d9a86c;
+  --line: rgba(43, 33, 28, 0.1);
+  --shadow: 0 12px 40px rgba(43, 33, 28, 0.08);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --moss: var(--accent);
+  --moss-deep: var(--accent-deep);
+  --clay: #b07a5c;
+  --wool: var(--paper);
+  --wool-deep: var(--paper-muted);
+  --mist: var(--blush);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-paper-muted: var(--paper-muted);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-blush: var(--blush);
+  --color-honey: var(--honey);
+  --color-moss: var(--moss);
+  --color-moss-deep: var(--moss-deep);
+  --color-clay: var(--clay);
+  --color-line: var(--line);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-fraunces);
+  --font-cjk: var(--font-noto);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--paper);
+  color: var(--foreground);
+  font-family: var(--font-manrope), var(--font-noto), sans-serif;
+  min-height: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a,
+button,
+summary,
+label[for],
+select,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--blush) 70%, white);
+}
+
+.font-display {
+  font-family: var(--font-fraunces), var(--font-noto), serif;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: linear-gradient(180deg, #b06a52 0%, var(--accent) 100%);
+  color: #fffaf6;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(154, 91, 69, 0.16);
+  transition: box-shadow 180ms ease;
+}
+
+.btn-primary:hover {
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--accent) 22%, white),
+    0 6px 16px rgba(154, 91, 69, 0.2);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--accent) 28%, transparent);
+  background: color-mix(in oklab, var(--blush) 55%, white);
+  color: var(--accent-deep);
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: none;
+  transition: box-shadow 180ms ease;
+}
+
+.btn-secondary:hover {
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--accent) 16%, white),
+    0 4px 12px rgba(154, 91, 69, 0.1);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 0.75rem 1.25rem;
+  font-weight: 600;
+  box-shadow: none;
+  transition: box-shadow 180ms ease;
+}
+
+.btn-ghost:hover {
+  box-shadow:
+    0 0 0 3px color-mix(in oklab, var(--accent) 12%, white),
+    0 4px 12px rgba(43, 33, 28, 0.06);
+}
+
+.btn-compact {
+  padding: 0.55rem 0.85rem;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .btn-compact {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.875rem;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(36px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.cat-enter {
+  opacity: 0;
+  animation: slide-in-right 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Tailwind doesn't ship duration-350 by default in all setups */
+.duration-350 {
+  transition-duration: 350ms;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  animation: fade-up 0.6s ease both;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
