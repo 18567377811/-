@@ -1,0 +1,16 @@
+# Git commit message（含 Source Control「Generate Commit Message」星标按钮）
+
+为本仓库生成 Git commit message 时（包括 SCM 面板一键生成），必须遵守：
+
+1. **语言**：标题与正文一律使用**简体中文**；禁止用英文写 subject/body。
+2. **格式**：优先 Conventional Commits — `type: 中文说明`，需要时可加简短中文正文。
+3. **type**（英文小写）：feat | fix | docs | style | refactor | perf | test | build | ci | chore | revert
+4. **subject**：中文说明「做了什么」，尽量 ≤50 字，句末不加句号。
+5. 代码实体、文件名、缩写（如 `API`、`Next.js`、`PM2`）可保留英文，嵌在中文句子里。
+
+示例：
+- `feat: 优化顶部导航与奶油风购物车角标`
+- `fix: 修复地区选择弹窗遮罩无法关闭`
+- `docs: 更新部署说明为 GitHub + Workbench 流程`
+
+不要生成：`Update code`、`Fix bug`、`WIP`、纯英文 subject。
