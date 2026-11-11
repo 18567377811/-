@@ -1,4 +1,6 @@
 import type Stripe from "stripe";
+import { OrderStatus } from "@prisma/client";
+import { prisma } from "@/lib/db";
 import { isSessionPaid } from "@/lib/stripe";
 
 /**
@@ -14,21 +16,38 @@ export async function fulfillPaidCheckout(session: Stripe.Checkout.Session) {
     return { fulfilled: false as const };
   }
 
-  // Idempotency: later persist by session.id and no-op if already recorded.
-  console.info("[fulfill] commission paid", {
-    sessionId: session.id,
-    paymentStatus: session.payment_status,
-    amountTotal: session.amount_total,
-    currency: session.currency,
-    customerEmail: session.customer_details?.email ?? session.customer_email,
-    customerName: session.customer_details?.name,
-    shipping: session.collected_information?.shipping_details,
-    locale: session.metadata?.locale,
-    items: session.metadata?.items,
-    invoiceId:
-      typeof session.invoice === "string" ? session.invoice : session.invoice?.id,
+  const existing = await prisma.order.findUnique({
+    where: { stripeSessionId: session.id },
+  });
+  if (existing) {
+    console.info("[fulfill] already recorded", { sessionId: session.id });
+    return { fulfilled: true as const, orderId: existing.id };
+  }
+
+  const shipping = session.collected_information?.shipping_details ?? null;
+  const order = await prisma.order.create({
+    data: {
+      stripeSessionId: session.id,
+      amountTotal: session.amount_total,
+      currency: session.currency,
+      customerEmail:
+        session.customer_details?.email ?? session.customer_email ?? null,
+      customerName: session.customer_details?.name ?? null,
+      shippingJson: shipping ? JSON.stringify(shipping) : null,
+      itemsJson: session.metadata?.items ?? "[]",
+      locale: session.metadata?.locale ?? null,
+      invoiceId:
+        typeof session.invoice === "string"
+          ? session.invoice
+          : (session.invoice?.id ?? null),
+      status: OrderStatus.awaiting_photos,
+    },
   });
 
-  // Next: write order row (status: awaiting_photos) + email photo-upload link.
-  return { fulfilled: true as const };
+  console.info("[fulfill] order saved", {
+    orderId: order.id,
+    sessionId: session.id,
+  });
+
+  return { fulfilled: true as const, orderId: order.id };
 }

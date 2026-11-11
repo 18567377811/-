@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { categoryEntries } from "@/data/home";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
+import type { CategoryEntry } from "@/types/commerce";
 
 function ChevronRightIcon({ className }: { className?: string }) {
   return (
@@ -29,10 +29,9 @@ function CategoryTile({
   entry,
   index,
 }: {
-  entry: (typeof categoryEntries)[number];
+  entry: CategoryEntry;
   index: number;
 }) {
-  const t = useTranslations();
   const { ref, visible } = useRevealOnView<HTMLAnchorElement>();
 
   return (
@@ -44,7 +43,7 @@ function CategoryTile({
     >
       <Image
         src={entry.image}
-        alt={t(entry.nameKey)}
+        alt={entry.name}
         fill
         className="object-cover transition duration-500 group-hover:scale-105"
         sizes="(max-width: 1024px) 50vw, 560px"
@@ -54,17 +53,21 @@ function CategoryTile({
 
       <div className="absolute inset-x-0 bottom-0 p-2.5 sm:p-4 lg:p-6">
         <p className="text-[13px] font-semibold text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)] transition duration-300 ease-out group-hover:-translate-y-0.5 sm:text-lg lg:text-xl">
-          {t(entry.nameKey)}
+          {entry.name}
         </p>
         <p className="mt-0 max-h-0 overflow-hidden text-[11px] leading-snug text-white/95 opacity-0 drop-shadow-[0_1px_6px_rgba(0,0,0,0.4)] transition-all duration-350 ease-out group-hover:mt-1.5 group-hover:max-h-12 group-hover:opacity-100 sm:text-sm">
-          {t(entry.hintKey)}
+          {entry.hint}
         </p>
       </div>
     </Link>
   );
 }
 
-export function CategoryRail() {
+export function CategoryRail({
+  categories,
+}: {
+  categories: CategoryEntry[];
+}) {
   const t = useTranslations();
 
   return (
@@ -80,7 +83,7 @@ export function CategoryRail() {
         </div>
 
         <Link
-          href="/collections/portrait"
+          href="/collections"
           aria-label={t("home.categoryTitle")}
           className="inline-flex items-center justify-center p-1 text-ink-soft transition-colors hover:text-accent"
         >
@@ -89,7 +92,7 @@ export function CategoryRail() {
       </div>
 
       <div className="grid w-full grid-cols-2 gap-2.5 sm:gap-4 lg:gap-5">
-        {categoryEntries.map((entry, index) => (
+        {categories.map((entry, index) => (
           <CategoryTile key={entry.slug} entry={entry} index={index} />
         ))}
       </div>

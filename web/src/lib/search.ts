@@ -1,4 +1,3 @@
-import { products } from "@/data/catalog";
 import type { Product } from "@/types/commerce";
 
 export type SearchSort = "relevance" | "price-asc" | "price-desc";
@@ -13,15 +12,15 @@ export type SearchFilters = {
 
 export const SEARCH_PRICE_BOUNDS = { min: 0, max: 1500 } as const;
 
-type TranslateFn = (key: string) => string;
-
-function haystack(product: Product, t: TranslateFn) {
+function haystack(product: Product) {
   return [
     product.slug,
     product.id,
     product.collection,
-    t(product.nameKey),
-    t(product.summaryKey),
+    product.categorySlug,
+    product.categoryName,
+    product.name,
+    product.summary,
     ...(product.keywords ?? []),
   ]
     .join(" ")
@@ -29,8 +28,8 @@ function haystack(product: Product, t: TranslateFn) {
 }
 
 export function filterProducts(
+  products: Product[],
   filters: SearchFilters,
-  t: TranslateFn,
 ): Product[] {
   const q = filters.query.trim().toLowerCase();
   let list = products.filter((product) => {
@@ -38,7 +37,7 @@ export function filterProducts(
     if (product.priceFromUsd < filters.priceMin) return false;
     if (product.priceFromUsd > filters.priceMax) return false;
     if (!q) return true;
-    return haystack(product, t).includes(q);
+    return haystack(product).includes(q);
   });
 
   if (filters.sort === "price-asc") {
@@ -47,8 +46,8 @@ export function filterProducts(
     list = [...list].sort((a, b) => b.priceFromUsd - a.priceFromUsd);
   } else if (q) {
     list = [...list].sort((a, b) => {
-      const aName = t(a.nameKey).toLowerCase();
-      const bName = t(b.nameKey).toLowerCase();
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
       const aScore = aName.includes(q) ? 0 : 1;
       const bScore = bName.includes(q) ? 0 : 1;
       return aScore - bScore;

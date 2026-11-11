@@ -5,11 +5,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
-import { products } from "@/data/catalog";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
+import type { Product } from "@/types/commerce";
 
-export function CartView() {
+export function CartView({ products }: { products: Product[] }) {
   const t = useTranslations();
   const locale = useLocale();
   const items = useCartStore((state) => state.items);
@@ -35,10 +35,10 @@ export function CartView() {
       })
       .filter(Boolean) as Array<{
       item: (typeof items)[number];
-      product: (typeof products)[number];
-      variant: (typeof products)[number]["variants"][number];
+      product: Product;
+      variant: Product["variants"][number];
     }>;
-  }, [items]);
+  }, [items, products]);
 
   const subtotal = lines.reduce(
     (sum, line) => sum + line.variant.priceUsd * line.item.quantity,
@@ -80,7 +80,7 @@ export function CartView() {
     return (
       <div className="rounded-[1.5rem] border border-dashed border-line bg-white/35 px-6 py-16 text-center">
         <p className="font-display text-3xl">{t("cart.empty")}</p>
-        <Link href="/collections/portrait" className="btn-primary mt-8">
+        <Link href="/collections" className="btn-primary mt-8">
           {t("products.continueShopping")}
         </Link>
       </div>
@@ -98,7 +98,7 @@ export function CartView() {
             <div className="relative h-28 w-24 overflow-hidden rounded-xl">
               <Image
                 src={product.image}
-                alt={t(product.nameKey)}
+                alt={product.name}
                 fill
                 className="object-cover"
                 sizes="96px"
@@ -107,12 +107,8 @@ export function CartView() {
             <div className="flex flex-1 flex-col gap-2">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="font-display text-xl">
-                    {t(product.nameKey)}
-                  </h2>
-                  <p className="text-sm text-ink-soft">
-                    {t(variant.labelKey)}
-                  </p>
+                  <h2 className="font-display text-xl">{product.name}</h2>
+                  <p className="text-sm text-ink-soft">{variant.label}</p>
                 </div>
                 <p className="font-semibold">
                   {formatUsd(variant.priceUsd * item.quantity, locale)}

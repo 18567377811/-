@@ -10,12 +10,14 @@ import {
   type SearchFilters,
   type SearchSort,
 } from "@/lib/search";
+import type { Product } from "@/types/commerce";
 import { SearchFilterPanel } from "./SearchFilterPanel";
 import { SearchFilterSheet } from "./SearchFilterSheet";
 import { SearchProductCard } from "./SearchProductCard";
 
 type Props = {
   initialQuery: string;
+  products: Product[];
 };
 
 function countActiveFilters(filters: SearchFilters) {
@@ -27,9 +29,8 @@ function countActiveFilters(filters: SearchFilters) {
   return count;
 }
 
-export function SearchView({ initialQuery }: Props) {
+export function SearchView({ initialQuery, products }: Props) {
   const t = useTranslations("search");
-  const tp = useTranslations();
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
@@ -58,8 +59,8 @@ export function SearchView({ initialQuery }: Props) {
   }, [initialQuery]);
 
   const results = useMemo(
-    () => filterProducts(filters, (key) => tp(key)),
-    [filters, tp],
+    () => filterProducts(products, filters),
+    [products, filters],
   );
 
   function commitQuery(nextQuery: string) {

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { routing } from "@/i18n/routing";
+import { getLocalizedSiteContent } from "@/lib/site-config";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -39,9 +40,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
+  const site = await getLocalizedSiteContent(locale);
 
   return {
-    title: t("title"),
+    title: site.siteTitle || t("title"),
     description: t("description"),
   };
 }
@@ -55,19 +57,24 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   setRequestLocale(locale);
   const messages = await getMessages();
+  const site = await getLocalizedSiteContent(locale);
 
   return (
-    <html
+    <div
       lang={locale}
-      className={`${manrope.variable} ${fraunces.variable} ${noto.variable} h-full antialiased`}
+      className={`${manrope.variable} ${fraunces.variable} ${noto.variable} flex min-h-dvh flex-col antialiased`}
+      style={
+        {
+          ["--accent" as string]: site.themeAccent,
+          ["--accent-deep" as string]: site.themeAccent,
+        } as React.CSSProperties
+      }
     >
-      <body className="flex min-h-full flex-col">
-        <NextIntlClientProvider messages={messages}>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+      <NextIntlClientProvider messages={messages}>
+        <SiteHeader siteTitle={site.siteTitle} logoUrl={site.logoUrl} />
+        <main className="flex-1">{children}</main>
+        <SiteFooter />
+      </NextIntlClientProvider>
+    </div>
   );
 }

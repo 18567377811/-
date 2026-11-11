@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum DisplayMode {
+  featured
+  grid
+}
+
+enum SaleType {
+  direct
+  custom
+}
+
+enum OrderStatus {
+  paid
+  awaiting_photos
+  in_production
+  preview_sent
+  revision
+  approved
+  shipped
+  completed
+}
+
+model Category {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  nameZh        String
+  nameEn        String
+  nameMs        String
+  descriptionZh String      @default("")
+  descriptionEn String      @default("")
+  descriptionMs String      @default("")
+  hintZh        String      @default("")
+  hintEn        String      @default("")
+  hintMs        String      @default("")
+  coverImage    String
+  displayMode   DisplayMode @default(grid)
+  showOnHome    Boolean     @default(true)
+  sortOrder     Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  products      Product[]
+}
+
+model Product {
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  categoryId       String
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  saleType         SaleType         @default(custom)
+  nameZh           String
+  nameEn           String
+  nameMs           String
+  summaryZh        String           @default("")
+  summaryEn        String           @default("")
+  summaryMs        String           @default("")
+  descriptionZh    String           @default("")
+  descriptionEn    String           @default("")
+  descriptionMs    String           @default("")
+  priceFromUsd     Float
+  turnaroundMonths String
+  rating           Float?
+  image            String
+  inStock          Boolean          @default(true)
+  keywords         String           @default("[]")
+  sortOrder        Int              @default(0)
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  variants         ProductVariant[]
+}
+
+model ProductVariant {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  labelZh   String
+  labelEn   String
+  labelMs   String
+  priceUsd  Float
+  sortOrder Int     @default(0)
+}
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  image     String
+  titleZh   String
+  titleEn   String
+  titleMs   String
+  bodyZh    String   @default("")
+  bodyEn    String   @default("")
+  bodyMs    String   @default("")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  stripeSessionId String      @unique
+  amountTotal     Int?
+  currency        String?
+  customerEmail   String?
+  customerName    String?
+  shippingJson    String?
+  itemsJson       String      @default("[]")
+  locale          String?
+  invoiceId       String?
+  status          OrderStatus @default(awaiting_photos)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model SiteConfig {
+  id                 String   @id @default("default")
+  logoUrl            String   @default("")
+  siteTitle          String   @default("Feltora")
+  themeAccent        String   @default("#9a5b45")
+  policyRefundZh     String   @default("")
+  policyRefundEn     String   @default("")
+  policyRefundMs     String   @default("")
+  policyShippingZh   String   @default("")
+  policyShippingEn   String   @default("")
+  policyShippingMs   String   @default("")
+  policyTermsZh      String   @default("")
+  policyTermsEn      String   @default("")
+  policyTermsMs      String   @default("")
+  policyCareZh       String   @default("")
+  policyCareEn       String   @default("")
+  policyCareMs       String   @default("")
+  photoGuideTitleZh  String   @default("拍照指南")
+  photoGuideTitleEn  String   @default("Photo Guide")
+  photoGuideTitleMs  String   @default("Panduan Foto")
+  photoGuideIntroZh  String   @default("")
+  photoGuideIntroEn  String   @default("")
+  photoGuideIntroMs  String   @default("")
+  photoGuideTipsJson String   @default("[]")
+  processTitleZh     String   @default("一起把性格做活")
+  processTitleEn     String   @default("Bring their character to life")
+  processTitleMs     String   @default("Hidupkan personaliti mereka")
+  processBodyZh      String   @default("")
+  processBodyEn      String   @default("")
+  processBodyMs      String   @default("")
+  processStepsJson   String   @default("[]")
+  faqJson            String   @default("[]")
+  socialJson         String   @default("[]")
+  thanksJson         String   @default("{}")
+  updatedAt          DateTime @updatedAt
+}
+
+model CommissionRequest {
+  id             String   @id @default(cuid())
+  productId      String?
+  productSlug    String?
+  productName    String?
+  fullName       String
+  email          String
+  country        String   @default("")
+  petName        String   @default("")
+  petBreed       String   @default("")
+  petDescription String   @default("")
+  preferredStyle String   @default("")
+  timing         String   @default("")
+  questions      String   @default("")
+  photosJson     String   @default("[]")
+  locale         String?
+  status         String   @default("new")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

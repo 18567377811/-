@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
-import { getProduct, products } from "@/data/catalog";
+import { getProductBySlug, listProducts } from "@/lib/catalog-queries";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -10,20 +10,28 @@ type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export function generateStaticParams() {
-  return routing.locales.flatMap((locale) =>
-    products.map((product) => ({
-      locale,
-      slug: product.slug,
-    })),
-  );
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  try {
+    const products = await listProducts(routing.defaultLocale);
+    return routing.locales.flatMap((locale) =>
+      products.map((product) => ({
+        locale,
+        slug: product.slug,
+      })),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export default async function ProductPage({ params }: Props) {
-  const { locale, slug } = await params;
-  setRequestLocale(locale);
+  const { locale: routeLocale, slug } = await params;
+  setRequestLocale(routeLocale);
+  const locale = await getLocale();
 
-  const product = getProduct(slug);
+  const product = await getProductBySlug(slug, locale);
   if (!product) notFound();
 
   const t = await getTranslations();
@@ -33,7 +41,7 @@ export default async function ProductPage({ params }: Props) {
       <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-paper-muted shadow-[var(--shadow)] ring-1 ring-[color:var(--line)] sm:rounded-[2rem]">
         <Image
           src={product.image}
-          alt={t(product.nameKey)}
+          alt={product.name}
           fill
           priority
           className="object-cover"
@@ -43,20 +51,21 @@ export default async function ProductPage({ params }: Props) {
 
       <div className="flex flex-col justify-center">
         <Link
-          href={`/collections/${product.collection}`}
+          href={`/collections/${product.categorySlug}`}
           className="text-sm font-medium text-accent hover:underline"
         >
-          {t(`collections.${product.collection}.name`)}
+          {product.categoryName}
         </Link>
         <h1 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-5xl">
-          {t(product.nameKey)}
+          {product.name}
         </h1>
         <p className="mt-4 text-base text-ink-soft sm:text-lg">
-          {t(product.summaryKey)}
+          {product.summary}
         </p>
-        <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-          {t(product.descriptionKey)}
-        </p>
+        <div
+          className="prose prose-neutral mt-4 max-w-none text-sm leading-relaxed text-ink-soft [&_img]:rounded-xl"
+          dangerouslySetInnerHTML={{ __html: product.description }}
+        />
         <p className="mt-6 text-sm">
           <span className="text-ink-soft">{t("products.turnaround")}: </span>
           <span className="font-semibold text-ink">

@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { heroSlides } from "@/data/home";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
+import type { HeroSlideView } from "@/types/commerce";
 
 function Chevron({
   direction,
@@ -35,7 +35,7 @@ function Chevron({
   );
 }
 
-export function HeroCarousel() {
+export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
   const t = useTranslations();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -43,26 +43,34 @@ export function HeroCarousel() {
   const { ref: heroRef, visible: heroVisible } =
     useRevealOnView<HTMLElement>({ threshold: 0.2 });
 
-  const go = useCallback((next: number) => {
-    const len = heroSlides.length;
-    setIndex(((next % len) + len) % len);
-  }, []);
+  const len = slides.length;
 
-  // Preload all slide images so fades stay smooth
+  const go = useCallback(
+    (next: number) => {
+      if (len === 0) return;
+      setIndex(((next % len) + len) % len);
+    },
+    [len],
+  );
+
   useEffect(() => {
-    heroSlides.forEach((slide) => {
+    slides.forEach((slide) => {
       const img = new window.Image();
       img.src = slide.image;
     });
-  }, []);
+  }, [slides]);
 
   useEffect(() => {
-    if (paused) return;
+    if (paused || len === 0) return;
     const timer = window.setInterval(() => {
-      setIndex((current) => (current + 1) % heroSlides.length);
+      setIndex((current) => (current + 1) % len);
     }, 5200);
     return () => window.clearInterval(timer);
-  }, [paused]);
+  }, [paused, len]);
+
+  if (len === 0) return null;
+
+  const current = slides[index] ?? slides[0];
 
   return (
     <section
@@ -91,7 +99,7 @@ export function HeroCarousel() {
       }}
     >
       <div className="relative aspect-[4/3] w-full touch-pan-y sm:aspect-[16/7] lg:aspect-[21/8]">
-        {heroSlides.map((slide, i) => (
+        {slides.map((slide, i) => (
           <div
             key={slide.id}
             className={`absolute inset-0 transition-opacity duration-700 ease-out ${
@@ -112,7 +120,7 @@ export function HeroCarousel() {
         ))}
 
         <div
-          key={heroSlides[index].id}
+          key={current.id}
           className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 pt-16 sm:px-8 sm:pb-10 lg:px-12"
         >
           <p
@@ -123,12 +131,12 @@ export function HeroCarousel() {
           <h1
             className={`${revealClass(heroVisible, "reveal")} mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl`}
           >
-            {t(heroSlides[index].titleKey)}
+            {current.title}
           </h1>
           <p
             className={`${revealClass(heroVisible, "reveal-delay")} mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base`}
           >
-            {t(heroSlides[index].bodyKey)}
+            {current.body}
           </p>
           <p
             className={`${revealClass(heroVisible, "reveal-delay")} mt-3 text-xs text-[#f0d2c4] sm:text-sm`}
@@ -156,7 +164,7 @@ export function HeroCarousel() {
       </div>
 
       <div className="absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 gap-2 sm:bottom-5">
-        {heroSlides.map((slide, i) => (
+        {slides.map((slide, i) => (
           <button
             key={slide.id}
             type="button"

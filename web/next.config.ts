@@ -20,6 +20,29 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ibb.co",
+      },
+      {
+        protocol: "https",
+        hostname: "files.catbox.moe",
+      },
+    ],
+  },
+  // Ensure Prisma engines ship with standalone output
+  outputFileTracingIncludes: {
+    "/*": [
+      "./node_modules/.prisma/**/*",
+      "./node_modules/@prisma/client/**/*",
     ],
   },
 };

@@ -55,10 +55,41 @@ if [[ -f "$SRC_DIR/deploy/workbench-update.sh" ]]; then
   chmod +x "$REMOTE_ROOT/deploy/workbench-update.sh"
 fi
 
+# ---------- SQLite 持久目录 ----------
+SHARED_ENV="$REMOTE_ROOT/shared/.env"
+SHARED_DATA="$REMOTE_ROOT/shared/data"
+mkdir -p "$REMOTE_ROOT/shared" "$SHARED_DATA"
+DB_FILE="$SHARED_DATA/feltora.db"
+
+# 确保 shared/.env 含 DATABASE_URL / 管理后台密钥
+if [[ -f "$SHARED_ENV" ]]; then
+  if ! grep -q '^DATABASE_URL=' "$SHARED_ENV" 2>/dev/null; then
+    echo "DATABASE_URL=\"file:$DB_FILE\"" >> "$SHARED_ENV"
+  fi
+  if ! grep -q '^ADMIN_PASSWORD=' "$SHARED_ENV" 2>/dev/null; then
+    echo "ADMIN_PASSWORD=\"change-me\"" >> "$SHARED_ENV"
+  fi
+  if ! grep -q '^ADMIN_SESSION_SECRET=' "$SHARED_ENV" 2>/dev/null; then
+    echo "ADMIN_SESSION_SECRET=\"$(openssl rand -hex 24 2>/dev/null || echo change-me-admin-secret)\"" >> "$SHARED_ENV"
+  fi
+fi
+
 # ---------- 构建 ----------
-echo "==> npm ci + build (may take a few minutes on 2G)"
+echo "==> npm ci + prisma migrate + build (may take a few minutes on 2G)"
 cd "$WEB_DIR"
 npm ci
+
+# 迁移指向持久库（构建前先同步 schema）
+export DATABASE_URL="file:$DB_FILE"
+npx prisma migrate deploy
+if [[ ! -f "$DB_FILE" ]] || [[ ! -s "$DB_FILE" ]]; then
+  echo "==> seed empty database"
+  npx tsx prisma/seed.ts || true
+else
+  # 若无分类则补种子（幂等）
+  npx tsx prisma/seed.ts || true
+fi
+
 npm run build
 
 if [[ ! -d .next/standalone ]]; then
@@ -79,16 +110,31 @@ cp -a .next/static "$RELEASE_DIR/.next/static"
 if [[ -d public ]]; then
   cp -a public "$RELEASE_DIR/public"
 fi
+# Prisma 查询引擎 / schema（standalone 追踪偶发遗漏时兜底）
+mkdir -p "$RELEASE_DIR/prisma" "$RELEASE_DIR/node_modules"
+if [[ -d node_modules/.prisma ]]; then
+  mkdir -p "$RELEASE_DIR/node_modules/.prisma"
+  cp -a node_modules/.prisma/. "$RELEASE_DIR/node_modules/.prisma/"
+fi
+if [[ -d node_modules/@prisma ]]; then
+  mkdir -p "$RELEASE_DIR/node_modules/@prisma"
+  cp -a node_modules/@prisma/. "$RELEASE_DIR/node_modules/@prisma/"
+fi
+cp -a prisma/. "$RELEASE_DIR/prisma/" 2>/dev/null || true
 
-# 持久密钥（Stripe 等）：不进 Git，放 shared/.env，每次发版拷进 release
-SHARED_ENV="$REMOTE_ROOT/shared/.env"
-mkdir -p "$REMOTE_ROOT/shared"
+# 持久密钥（Stripe / DB / Admin）：不进 Git，放 shared/.env，每次发版拷进 release
 if [[ -f "$SHARED_ENV" ]]; then
   echo "==> apply shared env → release"
   cp -f "$SHARED_ENV" "$RELEASE_DIR/.env"
   cp -f "$SHARED_ENV" "$RELEASE_DIR/.env.production"
 else
-  echo "WARN: missing $SHARED_ENV (Stripe checkout will return 503 until created)"
+  echo "WARN: missing $SHARED_ENV (Stripe/admin will fail until created)"
+  cat > "$RELEASE_DIR/.env" <<EOF
+DATABASE_URL="file:$DB_FILE"
+ADMIN_PASSWORD="change-me"
+ADMIN_SESSION_SECRET="change-me-admin-secret"
+NEXT_PUBLIC_SITE_URL=https://thestoryofawool.me
+EOF
 fi
 
 # app 若是普通目录（首次误拷），ln -sfn 不会替换，必须先删掉再挂软链

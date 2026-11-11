@@ -31,7 +31,7 @@ export function ProductCard({ product, index = 0 }: Props) {
       <div className="relative aspect-square overflow-hidden bg-paper">
         <Image
           src={product.image}
-          alt={t(product.nameKey)}
+          alt={product.name}
           fill
           className="object-cover transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -39,7 +39,7 @@ export function ProductCard({ product, index = 0 }: Props) {
       </div>
       <div className="space-y-1 px-3 py-3 text-center sm:px-4 sm:py-4">
         <h3 className="line-clamp-2 font-display text-sm leading-snug text-ink sm:text-base">
-          {t(product.nameKey)}
+          {product.name}
         </h3>
         <p className="text-xs text-ink-soft sm:text-sm">
           {t("products.from")} {formatUsd(product.priceFromUsd, locale)}

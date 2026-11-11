@@ -127,9 +127,13 @@ cd "d:\0-Xiangmu\宠物毛毡"
   deploy/              # 服务器上的 setup 脚本备份
 ```
 
-- 管理后台可先做在 **同一 Next 应用** 的 `/admin`（无需改 Nginx）。
-- 若日后拆成独立 Node 进程，改 `deploy/nginx/feltora.conf.template` 里预留的 `/admin/` location，再 `-InitServer` 或手动 reload Nginx。
-- **Stripe 等密钥**：放 `/var/www/feltora/shared/.env`（`workbench-update.sh` 每次发版会注入 release + PM2）。模板见 `web/.env.example`。
+- 管理后台在同一 Next 应用：`https://thestoryofawool.me/admin`（无需改 Nginx；PC / 手机均可）。
+- **SQLite**：`/var/www/feltora/shared/data/feltora.db`（发版不丢）。`workbench-update.sh` 会 `prisma migrate deploy` + 幂等 seed。
+- **shared/.env** 需含（模板见 `web/.env.example`）：
+  - `DATABASE_URL="file:/var/www/feltora/shared/data/feltora.db"`
+  - `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`
+  - Stripe 密钥与 `NEXT_PUBLIC_SITE_URL`
+- 本地：`cd web && cp .env.example .env` → `npx prisma migrate dev` → `npm run db:seed` → `npm run dev`，打开 `/admin`。
 
 ---
 

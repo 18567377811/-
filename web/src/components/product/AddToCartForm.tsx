@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
@@ -14,11 +15,36 @@ export function AddToCartForm({ product }: { product: Product }) {
   const [variantId, setVariantId] = useState(product.variants[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const isCustom = product.saleType !== "direct";
 
   const selected = useMemo(
     () => product.variants.find((variant) => variant.id === variantId),
     [product.variants, variantId],
   );
+
+  if (isCustom) {
+    return (
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm text-ink-soft">{t("products.from")}</p>
+          <p className="font-display text-3xl">
+            {formatUsd(product.priceFromUsd, locale)}
+          </p>
+        </div>
+        <p className="text-sm leading-relaxed text-ink-soft">
+          {locale === "zh"
+            ? "定制商品需先提交委托申请，确认方案后再付款。"
+            : "Custom commissions start with a request form — no charge until you approve the plan."}
+        </p>
+        <Link
+          href={`/commission/${product.slug}`}
+          className="btn-primary inline-flex min-w-40"
+        >
+          {locale === "zh" ? "开始定制申请" : "Start commission request"}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -53,7 +79,7 @@ export function AddToCartForm({ product }: { product: Product }) {
                     : "border-line bg-white hover:border-accent/40"
                 }`}
               >
-                {t(variant.labelKey)}
+                {variant.label}
               </button>
             );
           })}

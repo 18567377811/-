@@ -1,7 +1,6 @@
-export type CollectionSlug = "portrait" | "miniature";
+export type DisplayMode = "featured" | "grid";
 
-/** Admin-configurable list layout for products in a category */
-export type CollectionDisplayMode = "featured" | "grid";
+export type SaleType = "direct" | "custom";
 
 export type CommissionStatus =
   | "paid"
@@ -15,25 +14,38 @@ export type CommissionStatus =
 
 export type ProductVariant = {
   id: string;
-  labelKey: string;
+  label: string;
+  labelZh?: string;
+  labelEn?: string;
+  labelMs?: string;
   priceUsd: number;
+  /** @deprecated use label — kept for gradual migration */
+  labelKey?: string;
 };
 
 export type Product = {
   id: string;
   slug: string;
-  collection: CollectionSlug;
-  nameKey: string;
-  summaryKey: string;
-  descriptionKey: string;
+  collection: string;
+  categoryId: string;
+  categorySlug: string;
+  categoryName: string;
+  name: string;
+  summary: string;
+  description: string;
   priceFromUsd: number;
   turnaroundMonths: string;
   rating?: number;
   image: string;
   variants: ProductVariant[];
-  /** Extra search tokens (en/zh/ms aliases) */
   keywords?: string[];
   inStock?: boolean;
+  displayMode?: DisplayMode;
+  saleType?: SaleType;
+  /** @deprecated use name — kept for gradual migration */
+  nameKey?: string;
+  summaryKey?: string;
+  descriptionKey?: string;
 };
 
 export type CartItem = {
@@ -43,10 +55,28 @@ export type CartItem = {
 };
 
 export type Collection = {
-  slug: CollectionSlug;
-  nameKey: string;
-  descriptionKey: string;
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  hint: string;
   heroImage: string;
-  /** How products in this category render on home / listing */
-  displayMode: CollectionDisplayMode;
+  displayMode: DisplayMode;
+  showOnHome: boolean;
+  sortOrder: number;
+};
+
+export type HeroSlideView = {
+  id: string;
+  image: string;
+  title: string;
+  body: string;
+};
+
+export type CategoryEntry = {
+  slug: string;
+  href: string;
+  name: string;
+  hint: string;
+  image: string;
 };

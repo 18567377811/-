@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as CheckoutBody;
     const locale = normalizeLocale(body.locale);
-    const lines = resolveCheckoutLines(body.items ?? []);
+    const lines = await resolveCheckoutLines(body.items ?? []);
     const siteUrl = getSiteUrl();
     const stripe = getStripe();
 

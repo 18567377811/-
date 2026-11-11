@@ -6,5 +6,9 @@ type Props = {
 };
 
 export default function RootLayout({ children }: Props) {
-  return children;
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-dvh antialiased">{children}</body>
+    </html>
+  );
 }

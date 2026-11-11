@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { collections, products } from "@/data/catalog";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
@@ -12,9 +11,11 @@ import type { Product } from "@/types/commerce";
 
 function QuickAdd({ product }: { product: Product }) {
   const t = useTranslations();
+  const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const [done, setDone] = useState(false);
   const variant = product.variants[0];
+  const isCustom = product.saleType !== "direct";
 
   return (
     <button
@@ -23,6 +24,10 @@ function QuickAdd({ product }: { product: Product }) {
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (isCustom) {
+          router.push(`/commission/${product.slug}`);
+          return;
+        }
         if (!variant) return;
         addItem({
           productId: product.id,
@@ -33,7 +38,11 @@ function QuickAdd({ product }: { product: Product }) {
         window.setTimeout(() => setDone(false), 1400);
       }}
     >
-      {done ? "✓" : t("products.addToCart")}
+      {isCustom
+        ? t("home.buyNow")
+        : done
+          ? "✓"
+          : t("products.addToCart")}
     </button>
   );
 }
@@ -43,6 +52,7 @@ function BuyNow({ product }: { product: Product }) {
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const variant = product.variants[0];
+  const isCustom = product.saleType !== "direct";
 
   return (
     <button
@@ -51,6 +61,10 @@ function BuyNow({ product }: { product: Product }) {
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
+        if (isCustom) {
+          router.push(`/commission/${product.slug}`);
+          return;
+        }
         if (!variant) return;
         addItem({
           productId: product.id,
@@ -92,7 +106,7 @@ function FeaturedCard({
         >
           <Image
             src={product.image}
-            alt={t(product.nameKey)}
+            alt={product.name}
             fill
             className="object-cover transition duration-700 hover:scale-[1.03]"
             sizes="(max-width: 1024px) 100vw, 50vw"
@@ -105,13 +119,13 @@ function FeaturedCard({
             className="flex flex-col gap-3 text-center lg:text-left"
           >
             <p className="text-[10px] tracking-[0.18em] text-accent uppercase">
-              {t(`collections.${product.collection}.name`)}
+              {product.categoryName}
             </p>
             <h3 className="font-display text-2xl leading-snug text-ink sm:text-3xl">
-              {t(product.nameKey)}
+              {product.name}
             </h3>
             <p className="mx-auto max-w-md text-sm leading-relaxed text-ink-soft lg:mx-0">
-              {t(product.descriptionKey)}
+              {product.description}
             </p>
             <p className="font-display text-2xl text-accent">
               {t("products.from")} {formatUsd(product.priceFromUsd, locale)}
@@ -151,7 +165,7 @@ function GridCard({ product, index }: { product: Product; index: number }) {
       <div className="relative aspect-square overflow-hidden bg-paper">
         <Image
           src={product.image}
-          alt={t(product.nameKey)}
+          alt={product.name}
           fill
           className="object-cover transition duration-500 group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, 280px"
@@ -159,7 +173,7 @@ function GridCard({ product, index }: { product: Product; index: number }) {
       </div>
       <div className="space-y-1 bg-white px-3 py-3 text-center sm:px-4 sm:py-4">
         <h3 className="line-clamp-2 font-display text-sm leading-snug text-ink sm:text-base">
-          {t(product.nameKey)}
+          {product.name}
         </h3>
         <p className="text-xs text-ink-soft sm:text-sm">
           {t("products.from")} {formatUsd(product.priceFromUsd, locale)}
@@ -172,25 +186,14 @@ function GridCard({ product, index }: { product: Product; index: number }) {
   );
 }
 
-function displayModeOf(product: Product) {
-  return (
-    collections.find((item) => item.slug === product.collection)
-      ?.displayMode ?? "grid"
-  );
-}
-
-export function ProductShowcase() {
+export function ProductShowcase({
+  featured,
+  grid,
+}: {
+  featured: Product[];
+  grid: Product[];
+}) {
   const t = useTranslations();
-
-  const { featured, grid } = useMemo(() => {
-    const featuredList: Product[] = [];
-    const gridList: Product[] = [];
-    for (const product of products) {
-      if (displayModeOf(product) === "featured") featuredList.push(product);
-      else gridList.push(product);
-    }
-    return { featured: featuredList, grid: gridList };
-  }, []);
 
   return (
     <section className="mt-8 px-4 sm:mt-12 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-6">

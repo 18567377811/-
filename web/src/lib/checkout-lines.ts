@@ -1,20 +1,5 @@
-import en from "../../messages/en.json";
-import { products } from "@/data/catalog";
+import { getProductById } from "@/lib/catalog-queries";
 import type { CartItem } from "@/types/commerce";
-
-type MessageTree = Record<string, unknown>;
-
-function messageAt(path: string): string {
-  const parts = path.split(".");
-  let cursor: unknown = en as MessageTree;
-  for (const part of parts) {
-    if (!cursor || typeof cursor !== "object" || !(part in cursor)) {
-      return path;
-    }
-    cursor = (cursor as MessageTree)[part];
-  }
-  return typeof cursor === "string" ? cursor : path;
-}
 
 export type CheckoutLine = {
   productId: string;
@@ -26,12 +11,16 @@ export type CheckoutLine = {
   image?: string;
 };
 
-export function resolveCheckoutLines(items: CartItem[]): CheckoutLine[] {
+export async function resolveCheckoutLines(
+  items: CartItem[],
+): Promise<CheckoutLine[]> {
   if (!Array.isArray(items) || items.length === 0) {
     throw new Error("Cart is empty");
   }
 
-  return items.map((item) => {
+  const lines: CheckoutLine[] = [];
+
+  for (const item of items) {
     if (
       !item?.productId ||
       !item?.variantId ||
@@ -42,7 +31,7 @@ export function resolveCheckoutLines(items: CartItem[]): CheckoutLine[] {
       throw new Error("Invalid cart item");
     }
 
-    const product = products.find((entry) => entry.id === item.productId);
+    const product = await getProductById(item.productId, "en");
     const variant = product?.variants.find(
       (entry) => entry.id === item.variantId,
     );
@@ -50,14 +39,16 @@ export function resolveCheckoutLines(items: CartItem[]): CheckoutLine[] {
       throw new Error("Unknown product or variant");
     }
 
-    return {
+    lines.push({
       productId: product.id,
       variantId: variant.id,
       quantity: item.quantity,
-      name: messageAt(product.nameKey),
-      variantLabel: messageAt(variant.labelKey),
+      name: product.name,
+      variantLabel: variant.label,
       unitAmountCents: Math.round(variant.priceUsd * 100),
       image: product.image,
-    };
-  });
+    });
+  }
+
+  return lines;
 }

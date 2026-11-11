@@ -23,12 +23,15 @@
 
 ```bash
 cd web
-cp .env.example .env.local   # 填入 Stripe 测试密钥
+cp .env.example .env          # 含 DATABASE_URL / ADMIN_* / Stripe
 npm install
+npx prisma migrate dev        # 创建 SQLite：web/data/feltora.db
+npm run db:seed               # 灌入分类/商品/轮播（已有数据则跳过）
 npm run dev
 ```
 
-打开 `http://localhost:3000`（会跳到 `/en`）。
+打开 `http://localhost:3000`（会跳到 `/en`）。  
+管理后台：`http://localhost:3000/admin`（密码见 `.env` 的 `ADMIN_PASSWORD`）。
 
 本地测支付回调：
 

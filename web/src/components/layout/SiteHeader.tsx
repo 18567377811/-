@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
@@ -14,7 +15,12 @@ const DESKTOP_LINKS = [
   { href: "/about" as const, key: "about" as const },
 ];
 
-export function SiteHeader() {
+type Props = {
+  siteTitle?: string;
+  logoUrl?: string;
+};
+
+export function SiteHeader({ siteTitle, logoUrl }: Props) {
   const t = useTranslations("nav");
   const brand = useTranslations("brand");
   const pathname = usePathname();
@@ -22,6 +28,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const isHome = pathname === "/" || pathname === "";
+  const title = siteTitle?.trim() || brand("name");
 
   return (
     <>
@@ -44,7 +51,10 @@ export function SiteHeader() {
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f7efe6] text-ink ring-1 ring-[rgba(43,33,28,0.08)] transition hover:bg-blush/55"
                 aria-label={t("back")}
                 onClick={() => {
-                  if (typeof window !== "undefined" && window.history.length > 1) {
+                  if (
+                    typeof window !== "undefined" &&
+                    window.history.length > 1
+                  ) {
                     router.back();
                   } else {
                     router.push("/");
@@ -55,13 +65,26 @@ export function SiteHeader() {
               </button>
             )}
 
-            <Link href="/" className="group min-w-0">
-              <div className="font-display text-xl tracking-tight text-ink transition group-hover:text-accent sm:text-2xl">
-                {brand("name")}
-              </div>
-              <p className="hidden text-xs text-ink-soft sm:block">
-                {brand("tagline")}
-              </p>
+            <Link href="/" className="group flex min-w-0 items-center gap-2.5">
+              {logoUrl ? (
+                <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#f7efe6] ring-1 ring-[rgba(43,33,28,0.08)] sm:h-10 sm:w-10">
+                  <Image
+                    src={logoUrl}
+                    alt={title}
+                    fill
+                    className="object-cover"
+                    sizes="40px"
+                  />
+                </span>
+              ) : null}
+              <span className="min-w-0">
+                <span className="block font-display text-xl tracking-tight text-ink transition group-hover:text-accent sm:text-2xl">
+                  {title}
+                </span>
+                <span className="hidden text-xs text-ink-soft sm:block">
+                  {brand("tagline")}
+                </span>
+              </span>
             </Link>
           </div>
 
