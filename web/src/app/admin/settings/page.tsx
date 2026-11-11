@@ -3,9 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { IconPlus, IconTrash } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 import {
   Field,
   ImageField,
+  ItemCard,
   LocaleFields,
   Section,
   Toggle,
@@ -91,7 +93,6 @@ const emptyFaq = (): Faq => ({
 export default function AdminSettingsPage() {
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/settings");
@@ -141,7 +142,6 @@ export default function AdminSettingsPage() {
   async function save() {
     if (!form) return;
     setSaving(true);
-    setMessage(null);
     try {
       const res = await fetch("/api/admin/settings", {
         method: "PUT",
@@ -150,9 +150,9 @@ export default function AdminSettingsPage() {
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || "保存失败");
-      setMessage("已保存");
+      adminToast.success("配置已保存");
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "保存失败");
+      adminToast.error(error instanceof Error ? error.message : "保存失败");
     } finally {
       setSaving(false);
     }
@@ -328,46 +328,50 @@ export default function AdminSettingsPage() {
             />
           </Field>
           {form.photoGuideTips.map((tip, index) => (
-            <div key={index} className="rounded-xl bg-[var(--ios-fill-soft)] p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <p className="text-xs font-semibold text-[var(--ios-secondary)]">
-                  提示 {index + 1}
-                </p>
+            <ItemCard
+              key={index}
+              title={`提示 ${index + 1}`}
+              action={
                 <button
                   type="button"
                   className="admin-icon-btn admin-icon-btn-danger"
-                  onClick={() =>
+                  onClick={() => {
                     setForm({
                       ...form,
                       photoGuideTips: form.photoGuideTips.filter(
                         (_, i) => i !== index,
                       ),
-                    })
-                  }
+                    });
+                    adminToast.info("已移除提示");
+                  }}
                 >
                   <IconTrash className="h-4 w-4" />
                 </button>
-              </div>
-              <LocaleFields
-                multiline
-                values={tip}
-                onChange={(v) => {
-                  const photoGuideTips = [...form.photoGuideTips];
-                  photoGuideTips[index] = v;
-                  setForm({ ...form, photoGuideTips });
-                }}
-              />
-            </div>
+              }
+            >
+              <Field label="提示内容">
+                <LocaleFields
+                  multiline
+                  values={tip}
+                  onChange={(v) => {
+                    const photoGuideTips = [...form.photoGuideTips];
+                    photoGuideTips[index] = v;
+                    setForm({ ...form, photoGuideTips });
+                  }}
+                />
+              </Field>
+            </ItemCard>
           ))}
           <button
             type="button"
             className="admin-btn admin-btn-secondary w-full"
-            onClick={() =>
+            onClick={() => {
               setForm({
                 ...form,
                 photoGuideTips: [...form.photoGuideTips, emptyTip()],
-              })
-            }
+              });
+              adminToast.success("已添加提示");
+            }}
           >
             <IconPlus className="h-4 w-4" />
             添加提示
@@ -411,26 +415,27 @@ export default function AdminSettingsPage() {
             />
           </Field>
           {form.processSteps.map((step, index) => (
-            <div key={index} className="space-y-2 rounded-xl bg-[var(--ios-fill-soft)] p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[var(--ios-secondary)]">
-                  步骤 {index + 1}
-                </p>
+            <ItemCard
+              key={index}
+              title={`步骤 ${index + 1}`}
+              action={
                 <button
                   type="button"
                   className="admin-icon-btn admin-icon-btn-danger"
-                  onClick={() =>
+                  onClick={() => {
                     setForm({
                       ...form,
                       processSteps: form.processSteps.filter(
                         (_, i) => i !== index,
                       ),
-                    })
-                  }
+                    });
+                    adminToast.info("已移除步骤");
+                  }}
                 >
                   <IconTrash className="h-4 w-4" />
                 </button>
-              </div>
+              }
+            >
               <Field label="步骤标题">
                 <LocaleFields
                   values={{
@@ -470,17 +475,18 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </Field>
-            </div>
+            </ItemCard>
           ))}
           <button
             type="button"
             className="admin-btn admin-btn-secondary w-full"
-            onClick={() =>
+            onClick={() => {
               setForm({
                 ...form,
                 processSteps: [...form.processSteps, emptyStep()],
-              })
-            }
+              });
+              adminToast.success("已添加步骤");
+            }}
           >
             <IconPlus className="h-4 w-4" />
             添加步骤
@@ -489,24 +495,25 @@ export default function AdminSettingsPage() {
 
         <Section title="常见问题">
           {form.faq.map((item, index) => (
-            <div key={index} className="space-y-2 rounded-xl bg-[var(--ios-fill-soft)] p-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[var(--ios-secondary)]">
-                  FAQ {index + 1}
-                </p>
+            <ItemCard
+              key={index}
+              title={`FAQ ${index + 1}`}
+              action={
                 <button
                   type="button"
                   className="admin-icon-btn admin-icon-btn-danger"
-                  onClick={() =>
+                  onClick={() => {
                     setForm({
                       ...form,
                       faq: form.faq.filter((_, i) => i !== index),
-                    })
-                  }
+                    });
+                    adminToast.info("已移除 FAQ");
+                  }}
                 >
                   <IconTrash className="h-4 w-4" />
                 </button>
-              </div>
+              }
+            >
               <Field label="问题">
                 <LocaleFields
                   values={{ zh: item.qZh, en: item.qEn, ms: item.qMs }}
@@ -538,14 +545,15 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </Field>
-            </div>
+            </ItemCard>
           ))}
           <button
             type="button"
             className="admin-btn admin-btn-secondary w-full"
-            onClick={() =>
-              setForm({ ...form, faq: [...form.faq, emptyFaq()] })
-            }
+            onClick={() => {
+              setForm({ ...form, faq: [...form.faq, emptyFaq()] });
+              adminToast.success("已添加 FAQ");
+            }}
           >
             <IconPlus className="h-4 w-4" />
             添加 FAQ
@@ -554,8 +562,7 @@ export default function AdminSettingsPage() {
 
         <Section title="页脚社交媒体">
           {form.social.map((item, index) => (
-            <div key={item.id} className="space-y-2 rounded-xl bg-[var(--ios-fill-soft)] p-3">
-              <p className="text-sm font-semibold">{item.label}</p>
+            <ItemCard key={item.id} title={item.label}>
               <Field label="跳转链接">
                 <input
                   className="admin-input"
@@ -575,9 +582,10 @@ export default function AdminSettingsPage() {
                   const social = [...form.social];
                   social[index] = { ...item, enabled };
                   setForm({ ...form, social });
+                  adminToast.success(enabled ? `已开启 ${item.label}` : `已关闭 ${item.label}`);
                 }}
               />
-            </div>
+            </ItemCard>
           ))}
         </Section>
 
@@ -644,30 +652,28 @@ export default function AdminSettingsPage() {
             />
           </Field>
           {form.thanks.steps.map((step, index) => (
-            <div
+            <ItemCard
               key={index}
-              className="space-y-2 rounded-xl bg-[var(--ios-fill-soft)] p-3"
-            >
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-semibold text-[var(--ios-secondary)]">
-                  步骤 {index + 1}
-                </p>
+              title={`步骤 ${index + 1}`}
+              action={
                 <button
                   type="button"
                   className="admin-icon-btn admin-icon-btn-danger"
-                  onClick={() =>
+                  onClick={() => {
                     setForm({
                       ...form,
                       thanks: {
                         ...form.thanks,
                         steps: form.thanks.steps.filter((_, i) => i !== index),
                       },
-                    })
-                  }
+                    });
+                    adminToast.info("已移除步骤");
+                  }}
                 >
                   <IconTrash className="h-4 w-4" />
                 </button>
-              </div>
+              }
+            >
               <Field label="步骤文案">
                 <LocaleFields
                   multiline
@@ -682,12 +688,12 @@ export default function AdminSettingsPage() {
                   }}
                 />
               </Field>
-            </div>
+            </ItemCard>
           ))}
           <button
             type="button"
             className="admin-btn admin-btn-secondary w-full"
-            onClick={() =>
+            onClick={() => {
               setForm({
                 ...form,
                 thanks: {
@@ -697,8 +703,9 @@ export default function AdminSettingsPage() {
                     { zh: "", en: "", ms: "" },
                   ],
                 },
-              })
-            }
+              });
+              adminToast.success("已添加感谢页步骤");
+            }}
           >
             <IconPlus className="h-4 w-4" />
             添加感谢页步骤
@@ -747,17 +754,15 @@ export default function AdminSettingsPage() {
           <button
             type="button"
             className="admin-btn admin-btn-secondary w-full"
-            onClick={() =>
-              setForm({ ...form, thanks: { ...DEFAULT_THANKS } })
-            }
+            onClick={() => {
+              setForm({ ...form, thanks: { ...DEFAULT_THANKS } });
+              adminToast.success("已恢复默认感谢页文案");
+            }}
           >
             恢复默认感谢页文案
           </button>
         </Section>
 
-        {message ? (
-          <p className="text-center text-sm text-[var(--ios-blue)]">{message}</p>
-        ) : null}
         <button
           type="button"
           className="admin-btn admin-btn-primary w-full py-3"

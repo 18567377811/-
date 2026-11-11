@@ -14,6 +14,7 @@ import {
   IconUnderline,
   IconUpload,
 } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 
 export function Field({
   label,
@@ -42,6 +43,32 @@ export function Section({
       <div className="admin-section-head">{title}</div>
       <div className="admin-section-body">{children}</div>
     </section>
+  );
+}
+
+/** Nested block inside a Section — stronger title than field labels. */
+export function ItemCard({
+  title,
+  subtitle,
+  action,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  action?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="admin-item-card">
+      <div className="admin-item-head">
+        <div className="min-w-0">
+          <p className="admin-item-title">{title}</p>
+          {subtitle ? <p className="admin-item-subtitle">{subtitle}</p> : null}
+        </div>
+        {action}
+      </div>
+      {children}
+    </div>
   );
 }
 
@@ -227,8 +254,9 @@ export function RichTextEditor({
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) throw new Error(data.error || "上传失败");
       run("insertImage", data.url);
+      adminToast.success("图片已插入");
     } catch (error) {
-      window.alert(error instanceof Error ? error.message : "上传失败");
+      adminToast.error(error instanceof Error ? error.message : "上传失败");
     } finally {
       setUploading(false);
     }
@@ -340,8 +368,11 @@ export function ImageField({
         throw new Error(data.error || "上传失败");
       }
       onChange(data.url);
+      adminToast.success("图片已上传");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "上传失败");
+      const message = err instanceof Error ? err.message : "上传失败";
+      setError(message);
+      adminToast.error(message);
     } finally {
       setUploading(false);
     }

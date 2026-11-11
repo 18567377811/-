@@ -122,7 +122,7 @@ cd "d:\0-Xiangmu\宠物毛毡"
 /var/www/feltora/
   app/                 # 当前发布（symlink → releases/xxx）
   releases/            # 历史版本（保留最近 5 个）
-  uploads/             # 日后宠物照片等对象
+  uploads/             # 商品 / 定制图本地存储（UPLOAD_DIR）
   logs/
   deploy/              # 服务器上的 setup 脚本备份
 ```

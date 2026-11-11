@@ -46,3 +46,6 @@ next-env.d.ts
 /data/*.db-journal
 /prisma/*.db
 /prisma/*.db-journal
+
+# uploaded images (local / production UPLOAD_DIR)
+/uploads/

@@ -8,6 +8,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 import {
   EmptyState,
   Field,
@@ -110,9 +111,12 @@ export default function AdminCategoriesPage() {
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || "保存失败");
       setOpen(false);
+      adminToast.success(editingId ? "分类已更新" : "分类已创建");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "保存失败");
+      const message = err instanceof Error ? err.message : "保存失败";
+      setError(message);
+      adminToast.error(message);
     } finally {
       setSaving(false);
     }
@@ -123,9 +127,10 @@ export default function AdminCategoriesPage() {
     const res = await fetch(`/api/admin/categories/${id}`, { method: "DELETE" });
     const data = (await res.json()) as { error?: string };
     if (!res.ok) {
-      window.alert(data.error || "删除失败");
+      adminToast.error(data.error || "删除失败");
       return;
     }
+    adminToast.success("分类已删除");
     await load();
   }
 
@@ -145,6 +150,7 @@ export default function AdminCategoriesPage() {
         body: JSON.stringify({ sortOrder: categories[index].sortOrder }),
       }),
     ]);
+    adminToast.success("排序已更新");
     await load();
   }
 

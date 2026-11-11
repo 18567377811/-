@@ -72,6 +72,9 @@ if [[ -f "$SHARED_ENV" ]]; then
   if ! grep -q '^ADMIN_SESSION_SECRET=' "$SHARED_ENV" 2>/dev/null; then
     echo "ADMIN_SESSION_SECRET=\"$(openssl rand -hex 24 2>/dev/null || echo change-me-admin-secret)\"" >> "$SHARED_ENV"
   fi
+  if ! grep -q '^UPLOAD_DIR=' "$SHARED_ENV" 2>/dev/null; then
+    echo "UPLOAD_DIR=\"$REMOTE_ROOT/uploads\"" >> "$SHARED_ENV"
+  fi
 fi
 
 # ---------- 构建 ----------

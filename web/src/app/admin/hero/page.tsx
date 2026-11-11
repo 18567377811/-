@@ -8,6 +8,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 import {
   EmptyState,
   Field,
@@ -105,9 +106,12 @@ export default function AdminHeroPage() {
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || "保存失败");
       setOpen(false);
+      adminToast.success(editingId ? "轮播已更新" : "轮播已创建");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "保存失败");
+      const message = err instanceof Error ? err.message : "保存失败";
+      setError(message);
+      adminToast.error(message);
     } finally {
       setSaving(false);
     }
@@ -115,7 +119,13 @@ export default function AdminHeroPage() {
 
   async function remove(id: string) {
     if (!window.confirm("确定删除该轮播？")) return;
-    await fetch(`/api/admin/hero-slides/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/hero-slides/${id}`, { method: "DELETE" });
+    if (!res.ok) {
+      const data = (await res.json()) as { error?: string };
+      adminToast.error(data.error || "删除失败");
+      return;
+    }
+    adminToast.success("轮播已删除");
     await load();
   }
 
@@ -135,6 +145,7 @@ export default function AdminHeroPage() {
         body: JSON.stringify({ sortOrder: slides[index].sortOrder }),
       }),
     ]);
+    adminToast.success("排序已更新");
     await load();
   }
 

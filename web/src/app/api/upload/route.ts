@@ -4,7 +4,7 @@ import { uploadImageFile } from "@/lib/upload-image";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** Public image upload for commission pet photos (ImgBB / Catbox). */
+/** Public image upload for commission pet photos (local disk / optional ImgBB). */
 export async function POST(request: Request) {
   try {
     const form = await request.formData();

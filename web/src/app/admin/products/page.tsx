@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { IconPlus, IconTrash } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 import {
   EmptyState,
   Field,
   ImageField,
+  ItemCard,
   ListCard,
   LocaleFields,
   Section,
@@ -186,9 +188,12 @@ export default function AdminProductsPage() {
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || "保存失败");
       setOpen(false);
+      adminToast.success(editingId ? "商品已更新" : "商品已创建");
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "保存失败");
+      const message = err instanceof Error ? err.message : "保存失败";
+      setError(message);
+      adminToast.error(message);
     } finally {
       setSaving(false);
     }
@@ -199,9 +204,10 @@ export default function AdminProductsPage() {
     const res = await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
     if (!res.ok) {
       const data = (await res.json()) as { error?: string };
-      window.alert(data.error || "删除失败");
+      adminToast.error(data.error || "删除失败");
       return;
     }
+    adminToast.success("商品已删除");
     await load();
   }
 
@@ -411,47 +417,47 @@ export default function AdminProductsPage() {
         <Section title="规格变体">
           <div className="space-y-3">
             {form.variants.map((variant, index) => (
-              <div
+              <ItemCard
                 key={index}
-                className="space-y-2 rounded-xl bg-[var(--ios-fill-soft)] p-3"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-semibold text-[var(--ios-secondary)]">
-                    规格 {index + 1}
-                  </p>
-                  {form.variants.length > 1 ? (
+                title={`规格 ${index + 1}`}
+                action={
+                  form.variants.length > 1 ? (
                     <button
                       type="button"
                       className="admin-icon-btn admin-icon-btn-danger"
                       aria-label="移除规格"
-                      onClick={() =>
+                      onClick={() => {
                         setForm({
                           ...form,
                           variants: form.variants.filter((_, i) => i !== index),
-                        })
-                      }
+                        });
+                        adminToast.info("已移除规格");
+                      }}
                     >
                       <IconTrash className="h-4 w-4" />
                     </button>
-                  ) : null}
-                </div>
-                <LocaleFields
-                  values={{
-                    zh: variant.labelZh,
-                    en: variant.labelEn,
-                    ms: variant.labelMs,
-                  }}
-                  onChange={(label) => {
-                    const variants = [...form.variants];
-                    variants[index] = {
-                      ...variant,
-                      labelZh: label.zh,
-                      labelEn: label.en,
-                      labelMs: label.ms,
-                    };
-                    setForm({ ...form, variants });
-                  }}
-                />
+                  ) : null
+                }
+              >
+                <Field label="规格名称">
+                  <LocaleFields
+                    values={{
+                      zh: variant.labelZh,
+                      en: variant.labelEn,
+                      ms: variant.labelMs,
+                    }}
+                    onChange={(label) => {
+                      const variants = [...form.variants];
+                      variants[index] = {
+                        ...variant,
+                        labelZh: label.zh,
+                        labelEn: label.en,
+                        labelMs: label.ms,
+                      };
+                      setForm({ ...form, variants });
+                    }}
+                  />
+                </Field>
                 <Field label="价格 USD">
                   <input
                     type="number"
@@ -467,17 +473,18 @@ export default function AdminProductsPage() {
                     }}
                   />
                 </Field>
-              </div>
+              </ItemCard>
             ))}
             <button
               type="button"
               className="admin-btn admin-btn-secondary w-full"
-              onClick={() =>
+              onClick={() => {
                 setForm({
                   ...form,
                   variants: [...form.variants, emptyVariant()],
-                })
-              }
+                });
+                adminToast.success("已添加规格");
+              }}
             >
               <IconPlus className="h-4 w-4" />
               添加规格

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { IconChevron } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 import {
   EmptyState,
   Field,
@@ -151,11 +152,12 @@ export default function AdminOrdersPage() {
       });
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        window.alert(data.error || "更新失败");
+        adminToast.error(data.error || "更新失败");
         return;
       }
       const data = (await res.json()) as { order: Order };
       setSelected(data.order);
+      adminToast.success("订单状态已更新");
       await load();
     } finally {
       setSaving(false);
@@ -176,11 +178,12 @@ export default function AdminOrdersPage() {
       );
       if (!res.ok) {
         const data = (await res.json()) as { error?: string };
-        window.alert(data.error || "更新失败");
+        adminToast.error(data.error || "更新失败");
         return;
       }
       const data = (await res.json()) as { commission: Commission };
       setSelectedCommission(data.commission);
+      adminToast.success("定制状态已更新");
       await load();
     } finally {
       setSaving(false);

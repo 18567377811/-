@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { adminToast } from "@/components/admin/toast";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -23,9 +24,12 @@ export default function AdminLoginPage() {
       if (!res.ok) {
         throw new Error(data.error || "登录失败");
       }
+      adminToast.success("登录成功");
       router.replace("/admin/categories");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "登录失败");
+      const message = err instanceof Error ? err.message : "登录失败";
+      setError(message);
+      adminToast.error(message);
       setLoading(false);
     }
   }

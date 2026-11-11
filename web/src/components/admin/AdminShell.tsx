@@ -11,6 +11,7 @@ import {
   IconProducts,
   IconSettings,
 } from "@/components/admin/icons";
+import { adminToast } from "@/components/admin/toast";
 
 const NAV = [
   { href: "/admin/categories", label: "分类", Icon: IconCategories },
@@ -50,6 +51,7 @@ export function AdminShell({
 
   async function logout() {
     await fetch("/api/admin/auth/logout", { method: "POST" });
+    adminToast.success("已退出登录");
     router.replace("/admin/login");
   }
 
@@ -103,10 +105,10 @@ export function AdminShell({
       <div className="flex min-w-0 flex-1 flex-col pb-[calc(4.75rem+var(--ios-safe-bottom))] md:pb-0">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-[var(--ios-separator)] bg-[rgba(242,242,247,0.86)] px-4 py-3 backdrop-blur-xl sm:px-6">
           <div>
-            <p className="text-[11px] font-semibold tracking-[0.16em] text-[var(--ios-secondary)] uppercase md:hidden">
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-[var(--ios-secondary)] uppercase md:hidden">
               Feltora Admin
             </p>
-            <h2 className="text-[1.35rem] font-semibold tracking-tight sm:text-2xl">
+            <h2 className="text-[1.4rem] font-semibold tracking-[-0.02em] text-[var(--ios-label)] sm:text-[1.65rem]">
               {title}
             </h2>
           </div>
