@@ -43,11 +43,13 @@ export async function PUT(request: Request, { params }: Params) {
         await tx.productVariant.deleteMany({ where: { productId: id } });
         await tx.productVariant.createMany({
           data: variants.map((variant, index) => {
+            const labelZh = String(variant.labelZh || "");
+            const labelEn = String(variant.labelEn || labelZh);
             const row = {
               productId: id,
-              labelZh: String(variant.labelZh),
-              labelEn: String(variant.labelEn),
-              labelMs: String(variant.labelMs ?? variant.labelEn),
+              labelZh,
+              labelEn,
+              labelMs: String(variant.labelMs || labelEn),
               priceUsd: Number(variant.priceUsd),
               sortOrder: Number(variant.sortOrder ?? index),
             };
@@ -56,18 +58,23 @@ export async function PUT(request: Request, { params }: Params) {
         });
       }
 
+      let nextSaleType: SaleType | undefined;
+      if (body.categoryId != null) {
+        const category = await tx.category.findUnique({
+          where: { id: String(body.categoryId) },
+          select: { saleType: true },
+        });
+        if (!category) throw badRequest("分类不存在");
+        nextSaleType = category.saleType;
+      }
+
       return tx.product.update({
         where: { id },
         data: {
           slug: body.slug != null ? String(body.slug).trim() : undefined,
           categoryId:
             body.categoryId != null ? String(body.categoryId) : undefined,
-          saleType:
-            body.saleType === "direct"
-              ? SaleType.direct
-              : body.saleType === "custom"
-                ? SaleType.custom
-                : undefined,
+          saleType: nextSaleType,
           nameZh: body.nameZh != null ? String(body.nameZh) : undefined,
           nameEn: body.nameEn != null ? String(body.nameEn) : undefined,
           nameMs: body.nameMs != null ? String(body.nameMs) : undefined,

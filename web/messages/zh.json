@@ -51,6 +51,8 @@
     "viewFeatured": "大图",
     "viewGrid": "双列",
     "buyNow": "立即购买",
+    "customizeNow": "立即定制",
+    "contactUs": "联系我们",
     "slides": {
       "bond": {
         "title": "它不只是宠物，是家人。",
@@ -120,6 +122,10 @@
     "turnaround": "预估工期",
     "months": "个月",
     "addToCart": "加入购物车",
+    "buyNow": "立即购买",
+    "buying": "正在跳转付款…",
+    "startCommission": "开始定制申请",
+    "contactUs": "联系我们",
     "chooseVariant": "选择规格",
     "continueShopping": "继续购物",
     "variants": {

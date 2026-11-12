@@ -20,6 +20,11 @@ import {
   Thumb,
   Toggle,
 } from "@/components/admin/ui";
+import {
+  syncLocaleTriples,
+  triple,
+  type LocaleTriple,
+} from "@/lib/admin-locale-sync";
 
 type Slide = {
   id: string;
@@ -46,13 +51,29 @@ const emptyForm = () => ({
   isActive: true,
 });
 
+type FormState = ReturnType<typeof emptyForm>;
+type LocaleBaseline = {
+  title: LocaleTriple;
+  body: LocaleTriple;
+};
+
 export default function AdminHeroPage() {
   const [slides, setSlides] = useState<Slide[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm());
+  const [localeBaseline, setLocaleBaseline] = useState<LocaleBaseline | null>(
+    null,
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function snapshotLocales(state: FormState): LocaleBaseline {
+    return {
+      title: triple(state.titleZh, state.titleEn, state.titleMs),
+      body: triple(state.bodyZh, state.bodyEn, state.bodyMs),
+    };
+  }
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/hero-slides");
@@ -66,15 +87,16 @@ export default function AdminHeroPage() {
   }, [load]);
 
   function openCreate() {
+    const next = emptyForm();
     setEditingId(null);
-    setForm(emptyForm());
+    setForm(next);
+    setLocaleBaseline(null);
     setError(null);
     setOpen(true);
   }
 
   function openEdit(slide: Slide) {
-    setEditingId(slide.id);
-    setForm({
+    const next: FormState = {
       image: slide.image,
       titleZh: slide.titleZh,
       titleEn: slide.titleEn,
@@ -84,7 +106,10 @@ export default function AdminHeroPage() {
       bodyMs: slide.bodyMs,
       sortOrder: slide.sortOrder,
       isActive: slide.isActive,
-    });
+    };
+    setEditingId(slide.id);
+    setForm(next);
+    setLocaleBaseline(snapshotLocales(next));
     setError(null);
     setOpen(true);
   }
@@ -93,6 +118,30 @@ export default function AdminHeroPage() {
     setSaving(true);
     setError(null);
     try {
+      adminToast.info("正在按中文自动翻译 EN/MS…");
+      const synced = await syncLocaleTriples([
+        {
+          id: "title",
+          current: triple(form.titleZh, form.titleEn, form.titleMs),
+          baseline: localeBaseline?.title,
+        },
+        {
+          id: "body",
+          current: triple(form.bodyZh, form.bodyEn, form.bodyMs),
+          baseline: localeBaseline?.body,
+        },
+      ]);
+      const nextForm: FormState = {
+        ...form,
+        titleZh: synced.title.zh,
+        titleEn: synced.title.en,
+        titleMs: synced.title.ms,
+        bodyZh: synced.body.zh,
+        bodyEn: synced.body.en,
+        bodyMs: synced.body.ms,
+      };
+      setForm(nextForm);
+
       const res = await fetch(
         editingId
           ? `/api/admin/hero-slides/${editingId}`
@@ -100,7 +149,7 @@ export default function AdminHeroPage() {
         {
           method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(nextForm),
         },
       );
       const data = (await res.json()) as { error?: string };

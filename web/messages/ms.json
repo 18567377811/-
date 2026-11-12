@@ -51,6 +51,8 @@
     "viewFeatured": "Besar",
     "viewGrid": "Dua lajur",
     "buyNow": "Beli sekarang",
+    "customizeNow": "Tempah sekarang",
+    "contactUs": "Hubungi kami",
     "slides": {
       "bond": {
         "title": "Dikenang seperti keluarga.",
@@ -120,6 +122,10 @@
     "turnaround": "Anggaran masa siap",
     "months": "bulan",
     "addToCart": "Tambah ke troli",
+    "buyNow": "Beli sekarang",
+    "buying": "Mengalih ke pembayaran…",
+    "startCommission": "Mula permohonan komisen",
+    "contactUs": "Hubungi kami",
     "chooseVariant": "Pilih pilihan",
     "continueShopping": "Terus membeli",
     "variants": {

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { AddToCartForm } from "@/components/product/AddToCartForm";
 import { getProductBySlug, listProducts } from "@/lib/catalog-queries";
+import { looksLikeHtml, stripHtml } from "@/lib/html-text";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -59,13 +60,23 @@ export default async function ProductPage({ params }: Props) {
         <h1 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-5xl">
           {product.name}
         </h1>
-        <p className="mt-4 text-base text-ink-soft sm:text-lg">
-          {product.summary}
-        </p>
-        <div
-          className="prose prose-neutral mt-4 max-w-none text-sm leading-relaxed text-ink-soft [&_img]:rounded-xl"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
+        {stripHtml(product.summary) ? (
+          <p className="mt-4 text-base text-ink-soft sm:text-lg">
+            {stripHtml(product.summary)}
+          </p>
+        ) : null}
+        {stripHtml(product.description) ? (
+          looksLikeHtml(product.description) ? (
+            <div
+              className="prose prose-neutral mt-4 max-w-none text-sm leading-relaxed text-ink-soft [&_img]:my-3 [&_img]:max-w-full [&_img]:rounded-xl"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          ) : (
+            <p className="mt-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-soft">
+              {product.description}
+            </p>
+          )
+        ) : null}
         <p className="mt-6 text-sm">
           <span className="text-ink-soft">{t("products.turnaround")}: </span>
           <span className="font-semibold text-ink">

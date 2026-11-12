@@ -1,6 +1,7 @@
-import { DisplayMode } from "@prisma/client";
+import { DisplayMode, SaleType } from "@prisma/client";
 import { badRequest, withAdmin } from "@/lib/admin-api";
 import { prisma } from "@/lib/db";
+import { ensureUniqueSlug, slugifyLabel } from "@/lib/slugify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,26 +19,48 @@ export async function GET() {
 export async function POST(request: Request) {
   return withAdmin(async () => {
     const body = await request.json();
-    if (!body?.slug || !body?.nameZh || !body?.nameEn || !body?.coverImage) {
-      throw badRequest("缺少必填字段");
+    if (!body?.nameZh || !body?.coverImage) {
+      throw badRequest("缺少必填字段（中文名称、封面图）");
     }
+    const nameZh = String(body.nameZh);
+    const nameEn = String(body.nameEn || nameZh);
+    const nameMs = String(body.nameMs || nameEn);
+    const descriptionZh = String(body.descriptionZh ?? "");
+    const descriptionEn = String(body.descriptionEn || descriptionZh);
+    const descriptionMs = String(body.descriptionMs || descriptionEn);
+    const hintZh = String(body.hintZh ?? "");
+    const hintEn = String(body.hintEn || hintZh);
+    const hintMs = String(body.hintMs || hintEn);
+    const rawSlug = String(body.slug ?? "").trim();
+    const slug = await ensureUniqueSlug(
+      rawSlug || slugifyLabel(nameEn || nameZh, "category"),
+      async (candidate) =>
+        Boolean(
+          await prisma.category.findUnique({
+            where: { slug: candidate },
+            select: { id: true },
+          }),
+        ),
+    );
     const category = await prisma.category.create({
       data: {
-        slug: String(body.slug).trim(),
-        nameZh: String(body.nameZh),
-        nameEn: String(body.nameEn),
-        nameMs: String(body.nameMs ?? body.nameEn),
-        descriptionZh: String(body.descriptionZh ?? ""),
-        descriptionEn: String(body.descriptionEn ?? ""),
-        descriptionMs: String(body.descriptionMs ?? ""),
-        hintZh: String(body.hintZh ?? ""),
-        hintEn: String(body.hintEn ?? ""),
-        hintMs: String(body.hintMs ?? ""),
+        slug,
+        nameZh,
+        nameEn,
+        nameMs,
+        descriptionZh,
+        descriptionEn,
+        descriptionMs,
+        hintZh,
+        hintEn,
+        hintMs,
         coverImage: String(body.coverImage),
         displayMode:
           body.displayMode === "featured"
             ? DisplayMode.featured
             : DisplayMode.grid,
+        saleType:
+          body.saleType === "direct" ? SaleType.direct : SaleType.custom,
         showOnHome: Boolean(body.showOnHome ?? true),
         sortOrder: Number(body.sortOrder ?? 0),
         isActive: body.isActive !== false,

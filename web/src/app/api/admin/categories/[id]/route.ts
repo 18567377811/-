@@ -1,4 +1,4 @@
-import { DisplayMode } from "@prisma/client";
+import { DisplayMode, SaleType } from "@prisma/client";
 import { badRequest, withAdmin } from "@/lib/admin-api";
 import { prisma } from "@/lib/db";
 
@@ -23,36 +23,53 @@ export async function PUT(request: Request, { params }: Params) {
   return withAdmin(async () => {
     const { id } = await params;
     const body = await request.json();
-    const category = await prisma.category.update({
-      where: { id },
-      data: {
-        slug: body.slug != null ? String(body.slug).trim() : undefined,
-        nameZh: body.nameZh != null ? String(body.nameZh) : undefined,
-        nameEn: body.nameEn != null ? String(body.nameEn) : undefined,
-        nameMs: body.nameMs != null ? String(body.nameMs) : undefined,
-        descriptionZh:
-          body.descriptionZh != null ? String(body.descriptionZh) : undefined,
-        descriptionEn:
-          body.descriptionEn != null ? String(body.descriptionEn) : undefined,
-        descriptionMs:
-          body.descriptionMs != null ? String(body.descriptionMs) : undefined,
-        hintZh: body.hintZh != null ? String(body.hintZh) : undefined,
-        hintEn: body.hintEn != null ? String(body.hintEn) : undefined,
-        hintMs: body.hintMs != null ? String(body.hintMs) : undefined,
-        coverImage:
-          body.coverImage != null ? String(body.coverImage) : undefined,
-        displayMode:
-          body.displayMode === "featured"
-            ? DisplayMode.featured
-            : body.displayMode === "grid"
-              ? DisplayMode.grid
-              : undefined,
-        showOnHome:
-          body.showOnHome != null ? Boolean(body.showOnHome) : undefined,
-        sortOrder:
-          body.sortOrder != null ? Number(body.sortOrder) : undefined,
-        isActive: body.isActive != null ? Boolean(body.isActive) : undefined,
-      },
+    const saleType =
+      body.saleType === "direct"
+        ? SaleType.direct
+        : body.saleType === "custom"
+          ? SaleType.custom
+          : undefined;
+
+    const category = await prisma.$transaction(async (tx) => {
+      const updated = await tx.category.update({
+        where: { id },
+        data: {
+          slug: body.slug != null ? String(body.slug).trim() : undefined,
+          nameZh: body.nameZh != null ? String(body.nameZh) : undefined,
+          nameEn: body.nameEn != null ? String(body.nameEn) : undefined,
+          nameMs: body.nameMs != null ? String(body.nameMs) : undefined,
+          descriptionZh:
+            body.descriptionZh != null ? String(body.descriptionZh) : undefined,
+          descriptionEn:
+            body.descriptionEn != null ? String(body.descriptionEn) : undefined,
+          descriptionMs:
+            body.descriptionMs != null ? String(body.descriptionMs) : undefined,
+          hintZh: body.hintZh != null ? String(body.hintZh) : undefined,
+          hintEn: body.hintEn != null ? String(body.hintEn) : undefined,
+          hintMs: body.hintMs != null ? String(body.hintMs) : undefined,
+          coverImage:
+            body.coverImage != null ? String(body.coverImage) : undefined,
+          displayMode:
+            body.displayMode === "featured"
+              ? DisplayMode.featured
+              : body.displayMode === "grid"
+                ? DisplayMode.grid
+                : undefined,
+          saleType,
+          showOnHome:
+            body.showOnHome != null ? Boolean(body.showOnHome) : undefined,
+          sortOrder:
+            body.sortOrder != null ? Number(body.sortOrder) : undefined,
+          isActive: body.isActive != null ? Boolean(body.isActive) : undefined,
+        },
+      });
+      if (saleType) {
+        await tx.product.updateMany({
+          where: { categoryId: id },
+          data: { saleType },
+        });
+      }
+      return updated;
     });
     return { category };
   });

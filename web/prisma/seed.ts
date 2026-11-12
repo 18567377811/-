@@ -1,12 +1,25 @@
-import { PrismaClient, DisplayMode } from "@prisma/client";
+import { DisplayMode, PrismaClient, SaleType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+async function wipeCatalog() {
+  await prisma.productVariant.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.heroSlide.deleteMany();
+}
+
 async function main() {
+  const force = process.argv.includes("--force");
   const existing = await prisma.category.count();
-  if (existing > 0) {
-    console.log("[seed] skip — database already has categories");
+  if (existing > 0 && !force) {
+    console.log("[seed] skip — database already has categories (pass --force to wipe)");
     return;
+  }
+
+  if (existing > 0) {
+    console.log("[seed] wiping categories, products, variants, hero slides…");
+    await wipeCatalog();
   }
 
   const portrait = await prisma.category.create({
@@ -26,6 +39,7 @@ async function main() {
       coverImage:
         "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&w=1600&q=80",
       displayMode: DisplayMode.featured,
+      saleType: SaleType.custom,
       showOnHome: true,
       sortOrder: 0,
     },
@@ -48,6 +62,7 @@ async function main() {
       coverImage:
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=1600&q=80",
       displayMode: DisplayMode.grid,
+      saleType: SaleType.direct,
       showOnHome: true,
       sortOrder: 1,
     },
@@ -58,6 +73,7 @@ async function main() {
       id: "portrait-dog",
       slug: "framed-pet-portrait-dog",
       categoryId: portrait.id,
+      saleType: SaleType.custom,
       nameZh: "装裱宠物肖像 — 狗狗",
       nameEn: "Framed Pet Portrait — Dog",
       nameMs: "Potret Haiwan Berbingkai — Anjing",
@@ -115,6 +131,7 @@ async function main() {
       id: "portrait-cat",
       slug: "framed-pet-portrait-cat",
       categoryId: portrait.id,
+      saleType: SaleType.custom,
       nameZh: "装裱宠物肖像 — 猫咪",
       nameEn: "Framed Pet Portrait — Cat",
       nameMs: "Potret Haiwan Berbingkai — Kucing",
@@ -165,14 +182,14 @@ async function main() {
       id: "mini-full",
       slug: "full-body-figurine",
       categoryId: miniature.id,
+      saleType: SaleType.direct,
       nameZh: "全身微缩",
       nameEn: "Full Body Figurine",
       nameMs: "Figurin Badan Penuh",
       summaryZh: "立体微缩，连姿态与性格一起留下。",
       summaryEn:
         "A sculptural miniature of your pet, pose and personality included.",
-      summaryMs:
-        "Miniatur arca haiwan anda, termasuk pose dan personaliti.",
+      summaryMs: "Miniatur arca haiwan anda, termasuk pose dan personaliti.",
       descriptionZh:
         "针毡覆盖支撑骨架。可选可调爪子，收到后也能微调站姿。",
       descriptionEn:
@@ -224,6 +241,7 @@ async function main() {
       id: "mini-small",
       slug: "mini-full-body-figurine",
       categoryId: miniature.id,
+      saleType: SaleType.direct,
       nameZh: "迷你全身微缩（7–10 cm）",
       nameEn: "Mini Full Body Figurine (7–10 cm)",
       nameMs: "Figurin Badan Penuh Mini (7–10 cm)",
@@ -281,8 +299,7 @@ async function main() {
         titleMs: "Lebih daripada haiwan — keluarga.",
         bodyZh: "把日常的陪伴，做成可以触摸的温柔纪念。",
         bodyEn: "Turn everyday companionship into a keepsake you can hold.",
-        bodyMs:
-          "Ubah teman harian menjadi cenderamata yang boleh disentuh.",
+        bodyMs: "Ubah teman harian menjadi cenderamata yang boleh disentuh.",
         sortOrder: 0,
       },
       {
@@ -313,6 +330,8 @@ async function main() {
   });
 
   console.log("[seed] categories, products, hero slides created");
+  console.log("  portrait → custom (featured)");
+  console.log("  miniature → direct (grid)");
 }
 
 main()

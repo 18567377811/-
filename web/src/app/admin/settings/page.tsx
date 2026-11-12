@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { IconPlus, IconTrash } from "@/components/admin/icons";
 import { adminToast } from "@/components/admin/toast";
@@ -12,6 +12,11 @@ import {
   Section,
   Toggle,
 } from "@/components/admin/ui";
+import {
+  syncLocaleTriples,
+  triple,
+  type LocaleSyncItem,
+} from "@/lib/admin-locale-sync";
 import {
   DEFAULT_THANKS,
   parseThanksContent,
@@ -90,8 +95,383 @@ const emptyFaq = (): Faq => ({
   aMs: "",
 });
 
+function buildSettingsSyncItems(
+  current: FormState,
+  baseline: FormState | null,
+): LocaleSyncItem[] {
+  const items: LocaleSyncItem[] = [
+    {
+      id: "policyRefund",
+      current: triple(
+        current.policyRefundZh,
+        current.policyRefundEn,
+        current.policyRefundMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.policyRefundZh,
+            baseline.policyRefundEn,
+            baseline.policyRefundMs,
+          )
+        : null,
+      html: true,
+    },
+    {
+      id: "policyShipping",
+      current: triple(
+        current.policyShippingZh,
+        current.policyShippingEn,
+        current.policyShippingMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.policyShippingZh,
+            baseline.policyShippingEn,
+            baseline.policyShippingMs,
+          )
+        : null,
+      html: true,
+    },
+    {
+      id: "policyTerms",
+      current: triple(
+        current.policyTermsZh,
+        current.policyTermsEn,
+        current.policyTermsMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.policyTermsZh,
+            baseline.policyTermsEn,
+            baseline.policyTermsMs,
+          )
+        : null,
+      html: true,
+    },
+    {
+      id: "policyCare",
+      current: triple(
+        current.policyCareZh,
+        current.policyCareEn,
+        current.policyCareMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.policyCareZh,
+            baseline.policyCareEn,
+            baseline.policyCareMs,
+          )
+        : null,
+      html: true,
+    },
+    {
+      id: "photoGuideTitle",
+      current: triple(
+        current.photoGuideTitleZh,
+        current.photoGuideTitleEn,
+        current.photoGuideTitleMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.photoGuideTitleZh,
+            baseline.photoGuideTitleEn,
+            baseline.photoGuideTitleMs,
+          )
+        : null,
+    },
+    {
+      id: "photoGuideIntro",
+      current: triple(
+        current.photoGuideIntroZh,
+        current.photoGuideIntroEn,
+        current.photoGuideIntroMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.photoGuideIntroZh,
+            baseline.photoGuideIntroEn,
+            baseline.photoGuideIntroMs,
+          )
+        : null,
+    },
+    {
+      id: "processTitle",
+      current: triple(
+        current.processTitleZh,
+        current.processTitleEn,
+        current.processTitleMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.processTitleZh,
+            baseline.processTitleEn,
+            baseline.processTitleMs,
+          )
+        : null,
+    },
+    {
+      id: "processBody",
+      current: triple(
+        current.processBodyZh,
+        current.processBodyEn,
+        current.processBodyMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.processBodyZh,
+            baseline.processBodyEn,
+            baseline.processBodyMs,
+          )
+        : null,
+    },
+    {
+      id: "thanksTitle",
+      current: triple(
+        current.thanks.titleZh,
+        current.thanks.titleEn,
+        current.thanks.titleMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.thanks.titleZh,
+            baseline.thanks.titleEn,
+            baseline.thanks.titleMs,
+          )
+        : null,
+    },
+    {
+      id: "thanksBody",
+      current: triple(
+        current.thanks.bodyZh,
+        current.thanks.bodyEn,
+        current.thanks.bodyMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.thanks.bodyZh,
+            baseline.thanks.bodyEn,
+            baseline.thanks.bodyMs,
+          )
+        : null,
+    },
+    {
+      id: "thanksNext",
+      current: triple(
+        current.thanks.nextZh,
+        current.thanks.nextEn,
+        current.thanks.nextMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.thanks.nextZh,
+            baseline.thanks.nextEn,
+            baseline.thanks.nextMs,
+          )
+        : null,
+    },
+    {
+      id: "thanksNote",
+      current: triple(
+        current.thanks.noteZh,
+        current.thanks.noteEn,
+        current.thanks.noteMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.thanks.noteZh,
+            baseline.thanks.noteEn,
+            baseline.thanks.noteMs,
+          )
+        : null,
+    },
+    {
+      id: "thanksCta",
+      current: triple(
+        current.thanks.ctaZh,
+        current.thanks.ctaEn,
+        current.thanks.ctaMs,
+      ),
+      baseline: baseline
+        ? triple(
+            baseline.thanks.ctaZh,
+            baseline.thanks.ctaEn,
+            baseline.thanks.ctaMs,
+          )
+        : null,
+    },
+  ];
+
+  current.photoGuideTips.forEach((tip, index) => {
+    items.push({
+      id: `tip-${index}`,
+      current: triple(tip.zh, tip.en, tip.ms),
+      baseline: baseline?.photoGuideTips[index]
+        ? triple(
+            baseline.photoGuideTips[index].zh,
+            baseline.photoGuideTips[index].en,
+            baseline.photoGuideTips[index].ms,
+          )
+        : null,
+    });
+  });
+
+  current.processSteps.forEach((step, index) => {
+    items.push(
+      {
+        id: `step-title-${index}`,
+        current: triple(step.titleZh, step.titleEn, step.titleMs),
+        baseline: baseline?.processSteps[index]
+          ? triple(
+              baseline.processSteps[index].titleZh,
+              baseline.processSteps[index].titleEn,
+              baseline.processSteps[index].titleMs,
+            )
+          : null,
+      },
+      {
+        id: `step-body-${index}`,
+        current: triple(step.bodyZh, step.bodyEn, step.bodyMs),
+        baseline: baseline?.processSteps[index]
+          ? triple(
+              baseline.processSteps[index].bodyZh,
+              baseline.processSteps[index].bodyEn,
+              baseline.processSteps[index].bodyMs,
+            )
+          : null,
+      },
+    );
+  });
+
+  current.faq.forEach((item, index) => {
+    items.push(
+      {
+        id: `faq-q-${index}`,
+        current: triple(item.qZh, item.qEn, item.qMs),
+        baseline: baseline?.faq[index]
+          ? triple(
+              baseline.faq[index].qZh,
+              baseline.faq[index].qEn,
+              baseline.faq[index].qMs,
+            )
+          : null,
+      },
+      {
+        id: `faq-a-${index}`,
+        current: triple(item.aZh, item.aEn, item.aMs),
+        baseline: baseline?.faq[index]
+          ? triple(
+              baseline.faq[index].aZh,
+              baseline.faq[index].aEn,
+              baseline.faq[index].aMs,
+            )
+          : null,
+      },
+    );
+  });
+
+  current.thanks.steps.forEach((step, index) => {
+    items.push({
+      id: `thanks-step-${index}`,
+      current: triple(step.zh, step.en, step.ms),
+      baseline: baseline?.thanks.steps[index]
+        ? triple(
+            baseline.thanks.steps[index].zh,
+            baseline.thanks.steps[index].en,
+            baseline.thanks.steps[index].ms,
+          )
+        : null,
+    });
+  });
+
+  return items;
+}
+
+function applySettingsSync(
+  form: FormState,
+  synced: Record<string, { zh: string; en: string; ms: string }>,
+): FormState {
+  return {
+    ...form,
+    policyRefundZh: synced.policyRefund.zh,
+    policyRefundEn: synced.policyRefund.en,
+    policyRefundMs: synced.policyRefund.ms,
+    policyShippingZh: synced.policyShipping.zh,
+    policyShippingEn: synced.policyShipping.en,
+    policyShippingMs: synced.policyShipping.ms,
+    policyTermsZh: synced.policyTerms.zh,
+    policyTermsEn: synced.policyTerms.en,
+    policyTermsMs: synced.policyTerms.ms,
+    policyCareZh: synced.policyCare.zh,
+    policyCareEn: synced.policyCare.en,
+    policyCareMs: synced.policyCare.ms,
+    photoGuideTitleZh: synced.photoGuideTitle.zh,
+    photoGuideTitleEn: synced.photoGuideTitle.en,
+    photoGuideTitleMs: synced.photoGuideTitle.ms,
+    photoGuideIntroZh: synced.photoGuideIntro.zh,
+    photoGuideIntroEn: synced.photoGuideIntro.en,
+    photoGuideIntroMs: synced.photoGuideIntro.ms,
+    processTitleZh: synced.processTitle.zh,
+    processTitleEn: synced.processTitle.en,
+    processTitleMs: synced.processTitle.ms,
+    processBodyZh: synced.processBody.zh,
+    processBodyEn: synced.processBody.en,
+    processBodyMs: synced.processBody.ms,
+    photoGuideTips: form.photoGuideTips.map((tip, index) => {
+      const next = synced[`tip-${index}`];
+      return next ? { zh: next.zh, en: next.en, ms: next.ms } : tip;
+    }),
+    processSteps: form.processSteps.map((step, index) => {
+      const title = synced[`step-title-${index}`];
+      const body = synced[`step-body-${index}`];
+      return {
+        titleZh: title?.zh ?? step.titleZh,
+        titleEn: title?.en ?? step.titleEn,
+        titleMs: title?.ms ?? step.titleMs,
+        bodyZh: body?.zh ?? step.bodyZh,
+        bodyEn: body?.en ?? step.bodyEn,
+        bodyMs: body?.ms ?? step.bodyMs,
+      };
+    }),
+    faq: form.faq.map((item, index) => {
+      const q = synced[`faq-q-${index}`];
+      const a = synced[`faq-a-${index}`];
+      return {
+        qZh: q?.zh ?? item.qZh,
+        qEn: q?.en ?? item.qEn,
+        qMs: q?.ms ?? item.qMs,
+        aZh: a?.zh ?? item.aZh,
+        aEn: a?.en ?? item.aEn,
+        aMs: a?.ms ?? item.aMs,
+      };
+    }),
+    thanks: {
+      ...form.thanks,
+      titleZh: synced.thanksTitle.zh,
+      titleEn: synced.thanksTitle.en,
+      titleMs: synced.thanksTitle.ms,
+      bodyZh: synced.thanksBody.zh,
+      bodyEn: synced.thanksBody.en,
+      bodyMs: synced.thanksBody.ms,
+      nextZh: synced.thanksNext.zh,
+      nextEn: synced.thanksNext.en,
+      nextMs: synced.thanksNext.ms,
+      noteZh: synced.thanksNote.zh,
+      noteEn: synced.thanksNote.en,
+      noteMs: synced.thanksNote.ms,
+      ctaZh: synced.thanksCta.zh,
+      ctaEn: synced.thanksCta.en,
+      ctaMs: synced.thanksCta.ms,
+      steps: form.thanks.steps.map((step, index) => {
+        const next = synced[`thanks-step-${index}`];
+        return next ? { zh: next.zh, en: next.en, ms: next.ms } : step;
+      }),
+    },
+  };
+}
+
 export default function AdminSettingsPage() {
   const [form, setForm] = useState<FormState | null>(null);
+  const baselineRef = useRef<FormState | null>(null);
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -99,7 +479,7 @@ export default function AdminSettingsPage() {
     if (!res.ok) return;
     const data = (await res.json()) as { config: Record<string, string> };
     const c = data.config;
-    setForm({
+    const next: FormState = {
       logoUrl: c.logoUrl || "",
       siteTitle: c.siteTitle || "Feltora",
       themeAccent: c.themeAccent || "#9a5b45",
@@ -132,7 +512,9 @@ export default function AdminSettingsPage() {
       faq: JSON.parse(c.faqJson || "[]") as Faq[],
       social: JSON.parse(c.socialJson || "[]") as Social[],
       thanks: parseThanksContent(c.thanksJson),
-    });
+    };
+    baselineRef.current = structuredClone(next);
+    setForm(next);
   }, []);
 
   useEffect(() => {
@@ -143,13 +525,21 @@ export default function AdminSettingsPage() {
     if (!form) return;
     setSaving(true);
     try {
+      adminToast.info("正在按中文自动翻译 EN/MS…");
+      const synced = await syncLocaleTriples(
+        buildSettingsSyncItems(form, baselineRef.current),
+      );
+      const nextForm = applySettingsSync(form, synced);
+      setForm(nextForm);
+
       const res = await fetch("/api/admin/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(nextForm),
       });
       const data = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(data.error || "保存失败");
+      baselineRef.current = structuredClone(nextForm);
       adminToast.success("配置已保存");
     } catch (error) {
       adminToast.error(error instanceof Error ? error.message : "保存失败");
@@ -181,7 +571,7 @@ export default function AdminSettingsPage() {
       }
     >
       <div className="space-y-4">
-        <Section title="品牌">
+        <Section title="品牌" collapsible defaultOpen={false}>
           <Field label="网站标题">
             <input
               className="admin-input"
@@ -216,7 +606,7 @@ export default function AdminSettingsPage() {
           </Field>
         </Section>
 
-        <Section title="政策页（富文本）">
+        <Section title="政策页（富文本）" collapsible defaultOpen={false}>
           <Field label="退款政策">
             <LocaleFields
               rich
@@ -291,7 +681,7 @@ export default function AdminSettingsPage() {
           </Field>
         </Section>
 
-        <Section title="拍照指南">
+        <Section title="拍照指南" collapsible defaultOpen={false}>
           <Field label="标题">
             <LocaleFields
               values={{
@@ -378,7 +768,7 @@ export default function AdminSettingsPage() {
           </button>
         </Section>
 
-        <Section title="一起把性格做活（下单步骤）">
+        <Section title="一起把性格做活（下单步骤）" collapsible defaultOpen={false}>
           <Field label="标题">
             <LocaleFields
               values={{
@@ -493,7 +883,7 @@ export default function AdminSettingsPage() {
           </button>
         </Section>
 
-        <Section title="常见问题">
+        <Section title="常见问题" collapsible defaultOpen={false}>
           {form.faq.map((item, index) => (
             <ItemCard
               key={index}
@@ -560,7 +950,7 @@ export default function AdminSettingsPage() {
           </button>
         </Section>
 
-        <Section title="页脚社交媒体">
+        <Section title="页脚社交媒体" collapsible defaultOpen={false}>
           {form.social.map((item, index) => (
             <ItemCard key={item.id} title={item.label}>
               <Field label="跳转链接">
@@ -589,7 +979,7 @@ export default function AdminSettingsPage() {
           ))}
         </Section>
 
-        <Section title="定制感谢页（中英并列）">
+        <Section title="定制感谢页（中英并列）" collapsible defaultOpen={false}>
           <Field label="主标题">
             <LocaleFields
               values={{

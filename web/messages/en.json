@@ -51,6 +51,8 @@
     "viewFeatured": "Featured",
     "viewGrid": "Grid",
     "buyNow": "Buy now",
+    "customizeNow": "Customize now",
+    "contactUs": "Contact us",
     "slides": {
       "bond": {
         "title": "Remembered like family.",
@@ -120,6 +122,10 @@
     "turnaround": "Estimated turnaround",
     "months": "months",
     "addToCart": "Add to cart",
+    "buyNow": "Buy now",
+    "buying": "Redirecting to payment…",
+    "startCommission": "Start commission request",
+    "contactUs": "Contact us",
     "chooseVariant": "Choose option",
     "continueShopping": "Continue shopping",
     "variants": {

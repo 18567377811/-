@@ -62,8 +62,21 @@ export type Collection = {
   hint: string;
   heroImage: string;
   displayMode: DisplayMode;
+  saleType: SaleType;
   showOnHome: boolean;
   sortOrder: number;
+};
+
+export type HomeCategoryBlock = {
+  category: Collection;
+  products: Product[];
+};
+
+export type HomeSaleSection = {
+  saleType: SaleType;
+  eyebrow: string;
+  title: string;
+  blocks: HomeCategoryBlock[];
 };
 
 export type HeroSlideView = {

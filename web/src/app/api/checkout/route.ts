@@ -7,7 +7,18 @@ import type { CartItem } from "@/types/commerce";
 type CheckoutBody = {
   items?: CartItem[];
   locale?: string;
+  /** Relative path after locale when buyer cancels Stripe Checkout */
+  cancelPath?: string;
 };
+
+function normalizeCancelPath(value: unknown): string {
+  if (typeof value !== "string") return "/cart";
+  const path = value.trim();
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("://")) {
+    return "/cart";
+  }
+  return path;
+}
 
 function normalizeLocale(value: unknown): AppLocale {
   if (typeof value === "string" && routing.locales.includes(value as AppLocale)) {
@@ -27,6 +38,7 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as CheckoutBody;
     const locale = normalizeLocale(body.locale);
+    const cancelPath = normalizeCancelPath(body.cancelPath);
     const lines = await resolveCheckoutLines(body.items ?? []);
     const siteUrl = getSiteUrl();
     const stripe = getStripe();
@@ -77,7 +89,7 @@ export async function POST(request: Request) {
         },
       })),
       success_url: `${siteUrl}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/${locale}/cart`,
+      cancel_url: `${siteUrl}/${locale}${cancelPath}`,
       metadata: {
         locale,
         business: "feltora",
@@ -105,7 +117,10 @@ export async function POST(request: Request) {
     const status =
       message === "Cart is empty" ||
       message === "Invalid cart item" ||
-      message === "Unknown product or variant"
+      message === "Unknown product or variant" ||
+      message === "Custom products cannot be checked out directly" ||
+      message === "NEXT_PUBLIC_SITE_URL is not set" ||
+      message === "STRIPE_SECRET_KEY is not set"
         ? 400
         : 500;
     console.error("[checkout]", error);

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { getLocale, getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { listActiveCategories } from "@/lib/catalog-queries";
+import { stripHtml } from "@/lib/html-text";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -50,9 +51,11 @@ export default async function CollectionsIndexPage({ params }: Props) {
             </div>
             <div className="space-y-1 px-4 py-4 sm:px-5">
               <h2 className="font-display text-xl text-ink">{category.name}</h2>
-              <p className="line-clamp-2 text-sm text-ink-soft">
-                {category.description}
-              </p>
+              {stripHtml(category.description) ? (
+                <p className="line-clamp-2 text-sm text-ink-soft">
+                  {stripHtml(category.description)}
+                </p>
+              ) : null}
               {!category.showOnHome ? (
                 <p className="pt-1 text-[11px] tracking-wide text-accent uppercase">
                   {locale === "zh" ? "更多分类" : "More"}

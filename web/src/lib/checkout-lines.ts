@@ -11,6 +11,13 @@ export type CheckoutLine = {
   image?: string;
 };
 
+/** Stripe only accepts absolute http(s) image URLs — skip local /uploads paths. */
+function stripeSafeImage(image?: string): string | undefined {
+  if (!image) return undefined;
+  if (/^https?:\/\//i.test(image)) return image;
+  return undefined;
+}
+
 export async function resolveCheckoutLines(
   items: CartItem[],
 ): Promise<CheckoutLine[]> {
@@ -38,6 +45,9 @@ export async function resolveCheckoutLines(
     if (!product || !variant) {
       throw new Error("Unknown product or variant");
     }
+    if (product.saleType !== "direct") {
+      throw new Error("Custom products cannot be checked out directly");
+    }
 
     lines.push({
       productId: product.id,
@@ -46,7 +56,7 @@ export async function resolveCheckoutLines(
       name: product.name,
       variantLabel: variant.label,
       unitAmountCents: Math.round(variant.priceUsd * 100),
-      image: product.image,
+      image: stripeSafeImage(product.image),
     });
   }
 

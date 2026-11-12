@@ -1,5 +1,4 @@
 import { getLocale } from "next-intl/server";
-import { CategoryRail } from "@/components/home/CategoryRail";
 import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { ProductShowcase } from "@/components/home/ProductShowcase";
 import { getHomePayload } from "@/lib/catalog-queries";
@@ -7,7 +6,7 @@ import { getLocalizedSiteContent } from "@/lib/site-config";
 
 export async function HomePage() {
   const locale = await getLocale();
-  const [{ categories, slides, featured, grid }, site] = await Promise.all([
+  const [{ slides, custom, direct }, site] = await Promise.all([
     getHomePayload(locale),
     getLocalizedSiteContent(locale),
   ]);
@@ -15,8 +14,7 @@ export async function HomePage() {
   return (
     <div className="pb-16 sm:pb-20">
       <HeroCarousel slides={slides} />
-      <CategoryRail categories={categories} />
-      <ProductShowcase featured={featured} grid={grid} />
+      <ProductShowcase sections={[custom, direct]} />
 
       <section className="mt-12 px-4 sm:mt-16 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-6">
         <h2 className="font-display text-2xl text-ink sm:text-3xl">

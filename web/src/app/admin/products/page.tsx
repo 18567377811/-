@@ -17,8 +17,18 @@ import {
   Thumb,
   Toggle,
 } from "@/components/admin/ui";
+import {
+  syncLocaleTriples,
+  triple,
+  type LocaleTriple,
+} from "@/lib/admin-locale-sync";
 
-type CategoryOption = { id: string; nameZh: string; slug: string };
+type CategoryOption = {
+  id: string;
+  nameZh: string;
+  slug: string;
+  saleType?: "direct" | "custom";
+};
 type Variant = {
   id?: string;
   labelZh: string;
@@ -31,7 +41,7 @@ type Product = {
   id: string;
   slug: string;
   categoryId: string;
-  saleType: "direct" | "custom";
+  saleType?: "direct" | "custom";
   nameZh: string;
   nameEn: string;
   nameMs: string;
@@ -61,7 +71,6 @@ function emptyForm(categoryId = "") {
   return {
     slug: "",
     categoryId,
-    saleType: "custom" as "direct" | "custom",
     nameZh: "",
     nameEn: "",
     nameMs: "",
@@ -83,14 +92,40 @@ function emptyForm(categoryId = "") {
   };
 }
 
+type FormState = ReturnType<typeof emptyForm>;
+type LocaleBaseline = {
+  name: LocaleTriple;
+  summary: LocaleTriple;
+  description: LocaleTriple;
+  variants: LocaleTriple[];
+};
+
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryOption[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm());
+  const [localeBaseline, setLocaleBaseline] = useState<LocaleBaseline | null>(
+    null,
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function snapshotLocales(state: FormState): LocaleBaseline {
+    return {
+      name: triple(state.nameZh, state.nameEn, state.nameMs),
+      summary: triple(state.summaryZh, state.summaryEn, state.summaryMs),
+      description: triple(
+        state.descriptionZh,
+        state.descriptionEn,
+        state.descriptionMs,
+      ),
+      variants: state.variants.map((variant) =>
+        triple(variant.labelZh, variant.labelEn, variant.labelMs),
+      ),
+    };
+  }
 
   const load = useCallback(async () => {
     const [pRes, cRes] = await Promise.all([
@@ -112,8 +147,10 @@ export default function AdminProductsPage() {
   }, [load]);
 
   function openCreate() {
+    const next = emptyForm(categories[0]?.id ?? "");
     setEditingId(null);
-    setForm(emptyForm(categories[0]?.id ?? ""));
+    setForm(next);
+    setLocaleBaseline(null);
     setError(null);
     setOpen(true);
   }
@@ -125,11 +162,9 @@ export default function AdminProductsPage() {
     } catch {
       keywords = "";
     }
-    setEditingId(product.id);
-    setForm({
+    const next: FormState = {
       slug: product.slug,
       categoryId: product.categoryId,
-      saleType: product.saleType || "custom",
       nameZh: product.nameZh,
       nameEn: product.nameEn,
       nameMs: product.nameMs,
@@ -155,7 +190,10 @@ export default function AdminProductsPage() {
         priceUsd: variant.priceUsd,
         sortOrder: variant.sortOrder ?? index,
       })),
-    });
+    };
+    setEditingId(product.id);
+    setForm(next);
+    setLocaleBaseline(snapshotLocales(next));
     setError(null);
     setOpen(true);
   }
@@ -164,18 +202,72 @@ export default function AdminProductsPage() {
     setSaving(true);
     setError(null);
     try {
-      const keywords = form.keywords
+      adminToast.info("正在按中文自动翻译 EN/MS…");
+      const synced = await syncLocaleTriples([
+        {
+          id: "name",
+          current: triple(form.nameZh, form.nameEn, form.nameMs),
+          baseline: localeBaseline?.name,
+        },
+        {
+          id: "summary",
+          current: triple(form.summaryZh, form.summaryEn, form.summaryMs),
+          baseline: localeBaseline?.summary,
+        },
+        {
+          id: "description",
+          current: triple(
+            form.descriptionZh,
+            form.descriptionEn,
+            form.descriptionMs,
+          ),
+          baseline: localeBaseline?.description,
+          html: true,
+        },
+        ...form.variants.map((variant, index) => ({
+          id: `variant-${index}`,
+          current: triple(variant.labelZh, variant.labelEn, variant.labelMs),
+          baseline: localeBaseline?.variants[index] ?? null,
+        })),
+      ]);
+
+      const nextForm: FormState = {
+        ...form,
+        nameZh: synced.name.zh,
+        nameEn: synced.name.en,
+        nameMs: synced.name.ms,
+        summaryZh: synced.summary.zh,
+        summaryEn: synced.summary.en,
+        summaryMs: synced.summary.ms,
+        descriptionZh: synced.description.zh,
+        descriptionEn: synced.description.en,
+        descriptionMs: synced.description.ms,
+        variants: form.variants.map((variant, index) => {
+          const label = synced[`variant-${index}`];
+          return {
+            ...variant,
+            labelZh: label.zh,
+            labelEn: label.en,
+            labelMs: label.ms,
+          };
+        }),
+      };
+      setForm(nextForm);
+
+      const keywords = nextForm.keywords
         .split(",")
         .map((item) => item.trim())
         .filter(Boolean);
       const payload = {
-        ...form,
+        ...nextForm,
         keywords,
         priceFromUsd:
-          form.priceFromUsd ||
-          Math.min(...form.variants.map((v) => Number(v.priceUsd) || 0)),
+          nextForm.priceFromUsd ||
+          Math.min(...nextForm.variants.map((v) => Number(v.priceUsd) || 0)),
         rating:
-          form.rating == null || Number.isNaN(form.rating) ? null : form.rating,
+          nextForm.rating == null || Number.isNaN(nextForm.rating)
+            ? null
+            : nextForm.rating,
       };
       const res = await fetch(
         editingId ? `/api/admin/products/${editingId}` : "/api/admin/products",
@@ -241,8 +333,10 @@ export default function AdminProductsPage() {
                   {product.nameZh}
                 </p>
                 <p className="mt-0.5 text-xs text-[var(--ios-secondary)]">
-                  {product.saleType === "direct" ? "直售" : "定制"} ·{" "}
-                  {product.category?.nameZh ?? "未分类"} · $
+                  {(product.category?.saleType || product.saleType) === "direct"
+                    ? "直售"
+                    : "定制"}{" "}
+                  · {product.category?.nameZh ?? "未分类"} · $
                   {product.priceFromUsd}
                 </p>
               </button>
@@ -283,34 +377,16 @@ export default function AdminProductsPage() {
                 { value: "", label: "选择分类" },
                 ...categories.map((category) => ({
                   value: category.id,
-                  label: `${category.nameZh} (${category.slug})`,
+                  label: `${category.nameZh}（${
+                    category.saleType === "direct" ? "直售" : "定制"
+                  }）`,
                 })),
               ]}
             />
           </Field>
-          <Field label="销售类型">
-            <Select
-              value={form.saleType}
-              onChange={(saleType) =>
-                setForm({
-                  ...form,
-                  saleType: saleType as "direct" | "custom",
-                })
-              }
-              options={[
-                { value: "custom", label: "定制商品（先填委托表单）" },
-                { value: "direct", label: "直售商品（购物车结算）" },
-              ]}
-            />
-          </Field>
-          <Field label="短链标识">
-            <input
-              className="admin-input"
-              value={form.slug}
-              placeholder="如 framed-pet-portrait-dog"
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            />
-          </Field>
+          <p className="text-[12px] text-[var(--ios-secondary)]">
+            销售类型跟随分类：定制走委托，直售可加入购物车结算。
+          </p>
         </Section>
 
         <Section title="文案">

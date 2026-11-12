@@ -5,9 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
+import { startStripeCheckout } from "@/lib/checkout-client";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
+
+function lineKey(productId: string, variantId: string) {
+  return `${productId}::${variantId}`;
+}
 
 export function CartView({ products }: { products: Product[] }) {
   const t = useTranslations();
@@ -18,6 +23,7 @@ export function CartView({ products }: { products: Product[] }) {
   const [ready, setReady] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setReady(true);
@@ -40,28 +46,57 @@ export function CartView({ products }: { products: Product[] }) {
     }>;
   }, [items, products]);
 
-  const subtotal = lines.reduce(
+  // Keep selection in sync when cart lines change; default new lines to checked.
+  useEffect(() => {
+    setSelected((prev) => {
+      const next: Record<string, boolean> = {};
+      for (const line of lines) {
+        const key = lineKey(line.item.productId, line.item.variantId);
+        next[key] = prev[key] ?? true;
+      }
+      return next;
+    });
+  }, [lines]);
+
+  const selectedLines = lines.filter(
+    (line) => selected[lineKey(line.item.productId, line.item.variantId)],
+  );
+
+  const allSelected =
+    lines.length > 0 && selectedLines.length === lines.length;
+
+  const subtotal = selectedLines.reduce(
     (sum, line) => sum + line.variant.priceUsd * line.item.quantity,
     0,
   );
 
+  function toggleAll(checked: boolean) {
+    const next: Record<string, boolean> = {};
+    for (const line of lines) {
+      next[lineKey(line.item.productId, line.item.variantId)] = checked;
+    }
+    setSelected(next);
+  }
+
   async function startCheckout() {
     setError(null);
+    if (selectedLines.length === 0) {
+      setError(
+        locale === "zh" ? "请先勾选要结算的商品" : "Select items to checkout",
+      );
+      return;
+    }
     setCheckingOut(true);
     try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, locale }),
+      await startStripeCheckout({
+        items: selectedLines.map((line) => ({
+          productId: line.item.productId,
+          variantId: line.item.variantId,
+          quantity: line.item.quantity,
+        })),
+        locale,
+        cancelPath: "/cart",
       });
-      const data = (await response.json()) as {
-        url?: string;
-        error?: string;
-      };
-      if (!response.ok || !data.url) {
-        throw new Error(data.error || t("cart.checkoutError"));
-      }
-      window.location.assign(data.url);
     } catch (err) {
       setError(err instanceof Error ? err.message : t("cart.checkoutError"));
       setCheckingOut(false);
@@ -89,54 +124,94 @@ export function CartView({ products }: { products: Product[] }) {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1.4fr_0.8fr]">
-      <ul className="space-y-4">
-        {lines.map(({ item, product, variant }) => (
-          <li
-            key={`${item.productId}-${item.variantId}`}
-            className="flex gap-4 rounded-[1.25rem] border border-line bg-white/45 p-4"
-          >
-            <div className="relative h-28 w-24 overflow-hidden rounded-xl">
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            </div>
-            <div className="flex flex-1 flex-col gap-2">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="font-display text-xl">{product.name}</h2>
-                  <p className="text-sm text-ink-soft">{variant.label}</p>
-                </div>
-                <p className="font-semibold">
-                  {formatUsd(variant.priceUsd * item.quantity, locale)}
-                </p>
-              </div>
-              <div className="mt-auto flex items-center justify-between gap-3">
-                <QuantityStepper
-                  id={`qty-${item.productId}-${item.variantId}`}
-                  label={t("cart.quantity")}
-                  value={item.quantity}
-                  min={1}
-                  max={20}
-                  onChange={(quantity) =>
-                    updateQuantity(item.productId, item.variantId, quantity)
+      <div className="space-y-3">
+        <label className="inline-flex items-center gap-2 px-1 text-sm text-ink-soft">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-[var(--accent)]"
+            checked={allSelected}
+            onChange={(event) => toggleAll(event.target.checked)}
+          />
+          {locale === "zh"
+            ? `全选（已选 ${selectedLines.length}/${lines.length}）`
+            : `Select all (${selectedLines.length}/${lines.length})`}
+        </label>
+
+        <ul className="space-y-4">
+          {lines.map(({ item, product, variant }) => {
+            const key = lineKey(item.productId, item.variantId);
+            const checked = Boolean(selected[key]);
+            return (
+              <li
+                key={key}
+                className="flex gap-3 rounded-[1.25rem] border border-line bg-white/45 p-4 sm:gap-4"
+              >
+                <input
+                  type="checkbox"
+                  className="mt-10 h-4 w-4 shrink-0 accent-[var(--accent)]"
+                  checked={checked}
+                  aria-label={
+                    locale === "zh" ? `选择 ${product.name}` : `Select ${product.name}`
+                  }
+                  onChange={(event) =>
+                    setSelected((prev) => ({
+                      ...prev,
+                      [key]: event.target.checked,
+                    }))
                   }
                 />
-                <button
-                  type="button"
-                  className="text-sm text-clay hover:underline"
-                  onClick={() => removeItem(item.productId, item.variantId)}
+                <Link
+                  href={`/products/${product.slug}`}
+                  className="relative h-28 w-24 shrink-0 overflow-hidden rounded-xl ring-1 ring-[color:var(--line)] transition hover:opacity-90"
                 >
-                  {t("cart.remove")}
-                </button>
-              </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    sizes="96px"
+                  />
+                </Link>
+                <div className="flex min-w-0 flex-1 flex-col gap-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/products/${product.slug}`}
+                        className="font-display text-xl text-ink transition hover:text-accent"
+                      >
+                        {product.name}
+                      </Link>
+                      <p className="text-sm text-ink-soft">{variant.label}</p>
+                    </div>
+                    <p className="shrink-0 font-semibold">
+                      {formatUsd(variant.priceUsd * item.quantity, locale)}
+                    </p>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between gap-3">
+                    <QuantityStepper
+                      id={`qty-${item.productId}-${item.variantId}`}
+                      label={t("cart.quantity")}
+                      value={item.quantity}
+                      min={1}
+                      max={20}
+                      onChange={(quantity) =>
+                        updateQuantity(item.productId, item.variantId, quantity)
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="text-sm text-clay hover:underline"
+                      onClick={() => removeItem(item.productId, item.variantId)}
+                    >
+                      {t("cart.remove")}
+                    </button>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
       <aside className="h-fit rounded-[1.25rem] border border-line bg-white/55 p-6">
         <div className="flex items-center justify-between">
@@ -145,6 +220,11 @@ export function CartView({ products }: { products: Product[] }) {
             {formatUsd(subtotal, locale)}
           </span>
         </div>
+        <p className="mt-2 text-xs text-ink-soft">
+          {locale === "zh"
+            ? `结算 ${selectedLines.length} 件已勾选商品`
+            : `${selectedLines.length} selected item(s)`}
+        </p>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
           {t("cart.note")}
         </p>
@@ -156,8 +236,8 @@ export function CartView({ products }: { products: Product[] }) {
         <button
           type="button"
           className="btn-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={checkingOut}
-          onClick={startCheckout}
+          disabled={checkingOut || selectedLines.length === 0}
+          onClick={() => void startCheckout()}
         >
           {checkingOut ? t("cart.checkoutLoading") : t("cart.checkout")}
         </button>

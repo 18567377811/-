@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   IconBold,
   IconChevronDown,
+  IconChevronUp,
   IconClose,
   IconHeading,
   IconImage,
@@ -24,24 +26,55 @@ export function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <div className="block">
       <span className="admin-label">{label}</span>
       {children}
-    </label>
+    </div>
   );
 }
 
 export function Section({
   title,
   children,
+  collapsible = false,
+  defaultOpen = true,
 }: {
   title: string;
   children: React.ReactNode;
+  /** When true, header toggles body open/closed (chevron on the right). */
+  collapsible?: boolean;
+  /** Initial open state when collapsible. Default true. */
+  defaultOpen?: boolean;
 }) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  if (!collapsible) {
+    return (
+      <section className="admin-section">
+        <div className="admin-section-head">{title}</div>
+        <div className="admin-section-body">{children}</div>
+      </section>
+    );
+  }
+
   return (
-    <section className="admin-section">
-      <div className="admin-section-head">{title}</div>
-      <div className="admin-section-body">{children}</div>
+    <section className="admin-section" data-collapsed={open ? "false" : "true"}>
+      <button
+        type="button"
+        className="admin-section-toggle"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        <span className="admin-section-head admin-section-head-inline">
+          {title}
+        </span>
+        {open ? (
+          <IconChevronUp className="h-5 w-5 shrink-0 text-[var(--ios-secondary)]" />
+        ) : (
+          <IconChevronDown className="h-5 w-5 shrink-0 text-[var(--ios-secondary)]" />
+        )}
+      </button>
+      {open ? <div className="admin-section-body">{children}</div> : null}
     </section>
   );
 }
@@ -107,22 +140,97 @@ export function Select({
   placeholder?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
   const rootRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const selected = options.find((item) => item.value === value);
 
+  useLayoutEffect(() => {
+    if (!open || !rootRef.current) return;
+    const rect = rootRef.current.getBoundingClientRect();
+    const menuHeight = Math.min(options.length * 48 + 8, 224);
+    const spaceBelow = window.innerHeight - rect.bottom - 12;
+    const openUp = spaceBelow < menuHeight && rect.top > spaceBelow;
+    setMenuStyle({
+      position: "fixed",
+      left: rect.left,
+      width: rect.width,
+      top: openUp ? undefined : rect.bottom + 6,
+      bottom: openUp ? window.innerHeight - rect.top + 6 : undefined,
+      zIndex: 90,
+      maxHeight: Math.min(menuHeight, openUp ? rect.top - 12 : spaceBelow),
+    });
+  }, [open, options.length]);
+
   useEffect(() => {
+    if (!open) return;
     function onDoc(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      const target = event.target as Node;
+      if (rootRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") setOpen(false);
+    }
+    function onReposition() {
+      if (!rootRef.current) return;
+      const rect = rootRef.current.getBoundingClientRect();
+      const menuHeight = Math.min(options.length * 48 + 8, 224);
+      const spaceBelow = window.innerHeight - rect.bottom - 12;
+      const openUp = spaceBelow < menuHeight && rect.top > spaceBelow;
+      setMenuStyle({
+        position: "fixed",
+        left: rect.left,
+        width: rect.width,
+        top: openUp ? undefined : rect.bottom + 6,
+        bottom: openUp ? window.innerHeight - rect.top + 6 : undefined,
+        zIndex: 90,
+        maxHeight: Math.min(menuHeight, openUp ? rect.top - 12 : spaceBelow),
+      });
     }
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, []);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open, options.length]);
+
+  const menu =
+    open && typeof document !== "undefined"
+      ? createPortal(
+          <div ref={menuRef} className="admin-select-menu" style={menuStyle}>
+            {options.map((option) => (
+              <button
+                key={option.value || "__empty"}
+                type="button"
+                className={`admin-select-option ${
+                  option.value === value ? "is-active" : ""
+                }`}
+                onClick={() => {
+                  onChange(option.value);
+                  setOpen(false);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )
+      : null;
 
   return (
     <div className="admin-select-wrap relative" ref={rootRef}>
       <button
         type="button"
         className="admin-select flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
         <span className={selected ? "" : "text-[var(--ios-secondary)]"}>
@@ -130,25 +238,7 @@ export function Select({
         </span>
         <IconChevronDown className="h-4 w-4 shrink-0 text-[var(--ios-secondary)]" />
       </button>
-      {open ? (
-        <div className="admin-select-menu">
-          {options.map((option) => (
-            <button
-              key={option.value || "__empty"}
-              type="button"
-              className={`admin-select-option ${
-                option.value === value ? "is-active" : ""
-              }`}
-              onClick={() => {
-                onChange(option.value);
-                setOpen(false);
-              }}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      {menu}
     </div>
   );
 }
@@ -185,6 +275,9 @@ export function LocaleFields({
           </button>
         ))}
       </div>
+      <p className="text-[11px] leading-snug text-[var(--ios-secondary)]">
+        优先填中文。保存时会自动翻译空的 EN/MS；中文改动后会重新同步译文。手动改过的译文不会被覆盖。
+      </p>
       {rich ? (
         <RichTextEditor
           value={values[lang]}
@@ -222,6 +315,7 @@ export function RichTextEditor({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const savedRange = useRef<Range | null>(null);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -234,9 +328,37 @@ export function RichTextEditor({
     onChange(ref.current?.innerHTML ?? "");
   }
 
-  function run(command: string, value?: string) {
-    document.execCommand(command, false, value);
+  function rememberSelection() {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    if (ref.current?.contains(range.commonAncestorContainer)) {
+      savedRange.current = range.cloneRange();
+    }
+  }
+
+  function restoreSelection() {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    const selection = window.getSelection();
+    if (!selection) return;
+    selection.removeAllRanges();
+    if (savedRange.current) {
+      selection.addRange(savedRange.current);
+    } else {
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      selection.addRange(range);
+    }
+  }
+
+  function run(command: string, commandValue?: string) {
+    restoreSelection();
+    document.execCommand(command, false, commandValue);
     emit();
+    rememberSelection();
   }
 
   function insertLink() {
@@ -253,7 +375,15 @@ export function RichTextEditor({
       const res = await fetch("/api/admin/upload", { method: "POST", body });
       const data = (await res.json()) as { url?: string; error?: string };
       if (!res.ok || !data.url) throw new Error(data.error || "上传失败");
-      run("insertImage", data.url);
+      restoreSelection();
+      const safeUrl = data.url.replace(/"/g, "&quot;");
+      document.execCommand(
+        "insertHTML",
+        false,
+        `<img src="${safeUrl}" alt="" />`,
+      );
+      emit();
+      rememberSelection();
       adminToast.success("图片已插入");
     } catch (error) {
       adminToast.error(error instanceof Error ? error.message : "上传失败");
@@ -296,6 +426,7 @@ export function RichTextEditor({
             title={label}
             onMouseDown={(e) => {
               e.preventDefault();
+              rememberSelection();
               action();
             }}
           >
@@ -310,6 +441,7 @@ export function RichTextEditor({
           disabled={uploading}
           onMouseDown={(e) => {
             e.preventDefault();
+            rememberSelection();
             fileRef.current?.click();
           }}
         >
@@ -326,6 +458,17 @@ export function RichTextEditor({
         suppressContentEditableWarning
         onInput={emit}
         onBlur={emit}
+        onKeyUp={rememberSelection}
+        onMouseUp={rememberSelection}
+        onPaste={(event) => {
+          // Avoid Word/Google Docs span soup — paste plain text only.
+          event.preventDefault();
+          const text = event.clipboardData.getData("text/plain");
+          if (!text) return;
+          rememberSelection();
+          document.execCommand("insertText", false, text);
+          emit();
+        }}
       />
       <input
         ref={fileRef}
@@ -463,14 +606,31 @@ export function Sheet({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
+  const suppressCloseUntil = useRef(0);
+
   useEffect(() => {
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+
+    // File pickers blur the window; the ensuing "ghost click" must not close the sheet.
+    const bump = () => {
+      suppressCloseUntil.current = Date.now() + 1200;
+    };
+    window.addEventListener("blur", bump);
+    window.addEventListener("focus", bump);
+
     return () => {
       document.body.style.overflow = prev;
+      window.removeEventListener("blur", bump);
+      window.removeEventListener("focus", bump);
     };
   }, [open]);
+
+  function requestClose() {
+    if (Date.now() < suppressCloseUntil.current) return;
+    onClose();
+  }
 
   if (!open) return null;
   return (
@@ -478,18 +638,20 @@ export function Sheet({
       className="admin-sheet"
       role="dialog"
       aria-modal="true"
-      onClick={onClose}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) requestClose();
+      }}
     >
       <div
         className="admin-sheet-panel"
-        onClick={(event) => event.stopPropagation()}
+        onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="admin-sheet-header">
           <button
             type="button"
             className="admin-icon-btn admin-icon-btn-ghost"
             aria-label="关闭"
-            onClick={onClose}
+            onClick={requestClose}
           >
             <IconClose className="h-5 w-5" />
           </button>

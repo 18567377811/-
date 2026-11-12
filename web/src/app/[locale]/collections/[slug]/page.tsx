@@ -6,6 +6,7 @@ import {
   getProductsByCategorySlug,
   listActiveCategories,
 } from "@/lib/catalog-queries";
+import { stripHtml } from "@/lib/html-text";
 import { routing } from "@/i18n/routing";
 
 type Props = {
@@ -48,9 +49,11 @@ export default async function CollectionPage({ params }: Props) {
         <h1 className="mt-1 font-display text-3xl text-ink sm:text-5xl">
           {collection.name}
         </h1>
-        <p className="mt-2 text-sm text-ink-soft sm:mt-4 sm:text-base">
-          {collection.description}
-        </p>
+        {stripHtml(collection.description) ? (
+          <p className="mt-2 text-sm text-ink-soft sm:mt-4 sm:text-base">
+            {stripHtml(collection.description)}
+          </p>
+        ) : null}
         <p className="mt-2 text-xs text-ink-soft sm:text-sm">
           {items.length} {locale === "zh" ? "件商品" : "products"}
         </p>

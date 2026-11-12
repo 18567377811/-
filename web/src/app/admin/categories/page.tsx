@@ -21,6 +21,11 @@ import {
   Thumb,
   Toggle,
 } from "@/components/admin/ui";
+import {
+  syncLocaleTriples,
+  triple,
+  type LocaleTriple,
+} from "@/lib/admin-locale-sync";
 
 type Category = {
   id: string;
@@ -36,6 +41,7 @@ type Category = {
   hintMs: string;
   coverImage: string;
   displayMode: "featured" | "grid";
+  saleType: "direct" | "custom";
   showOnHome: boolean;
   sortOrder: number;
   isActive: boolean;
@@ -55,18 +61,41 @@ const emptyForm = (): Omit<Category, "id" | "_count"> => ({
   hintMs: "",
   coverImage: "",
   displayMode: "grid",
+  saleType: "custom",
   showOnHome: true,
   sortOrder: 0,
   isActive: true,
 });
+
+type FormState = ReturnType<typeof emptyForm>;
+type LocaleBaseline = {
+  name: LocaleTriple;
+  description: LocaleTriple;
+  hint: LocaleTriple;
+};
 
 export default function AdminCategoriesPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm());
+  const [localeBaseline, setLocaleBaseline] = useState<LocaleBaseline | null>(
+    null,
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function snapshotLocales(state: FormState): LocaleBaseline {
+    return {
+      name: triple(state.nameZh, state.nameEn, state.nameMs),
+      description: triple(
+        state.descriptionZh,
+        state.descriptionEn,
+        state.descriptionMs,
+      ),
+      hint: triple(state.hintZh, state.hintEn, state.hintMs),
+    };
+  }
 
   const load = useCallback(async () => {
     const res = await fetch("/api/admin/categories");
@@ -80,8 +109,10 @@ export default function AdminCategoriesPage() {
   }, [load]);
 
   function openCreate() {
+    const next = emptyForm();
     setEditingId(null);
-    setForm(emptyForm());
+    setForm(next);
+    setLocaleBaseline(null);
     setError(null);
     setOpen(true);
   }
@@ -90,6 +121,7 @@ export default function AdminCategoriesPage() {
     setEditingId(category.id);
     const { id: _id, _count, ...rest } = category;
     setForm(rest);
+    setLocaleBaseline(snapshotLocales(rest));
     setError(null);
     setOpen(true);
   }
@@ -98,6 +130,42 @@ export default function AdminCategoriesPage() {
     setSaving(true);
     setError(null);
     try {
+      adminToast.info("正在按中文自动翻译 EN/MS…");
+      const synced = await syncLocaleTriples([
+        {
+          id: "name",
+          current: triple(form.nameZh, form.nameEn, form.nameMs),
+          baseline: localeBaseline?.name,
+        },
+        {
+          id: "description",
+          current: triple(
+            form.descriptionZh,
+            form.descriptionEn,
+            form.descriptionMs,
+          ),
+          baseline: localeBaseline?.description,
+        },
+        {
+          id: "hint",
+          current: triple(form.hintZh, form.hintEn, form.hintMs),
+          baseline: localeBaseline?.hint,
+        },
+      ]);
+      const nextForm: FormState = {
+        ...form,
+        nameZh: synced.name.zh,
+        nameEn: synced.name.en,
+        nameMs: synced.name.ms,
+        descriptionZh: synced.description.zh,
+        descriptionEn: synced.description.en,
+        descriptionMs: synced.description.ms,
+        hintZh: synced.hint.zh,
+        hintEn: synced.hint.en,
+        hintMs: synced.hint.ms,
+      };
+      setForm(nextForm);
+
       const res = await fetch(
         editingId
           ? `/api/admin/categories/${editingId}`
@@ -105,7 +173,7 @@ export default function AdminCategoriesPage() {
         {
           method: editingId ? "PUT" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify(nextForm),
         },
       );
       const data = (await res.json()) as { error?: string };
@@ -184,6 +252,7 @@ export default function AdminCategoriesPage() {
                   {category.nameZh}
                 </p>
                 <p className="mt-0.5 text-xs text-[var(--ios-secondary)]">
+                  {category.saleType === "direct" ? "直售" : "定制"} ·{" "}
                   {category.displayMode === "featured" ? "大图" : "双列"} ·{" "}
                   {category.showOnHome ? "首页展示" : "仅分类页"} ·{" "}
                   {category._count?.products ?? 0} 件
@@ -238,14 +307,6 @@ export default function AdminCategoriesPage() {
         }
       >
         <Section title="基本信息">
-          <Field label="短链标识">
-            <input
-              className="admin-input"
-              value={form.slug}
-              placeholder="如 portrait"
-              onChange={(e) => setForm({ ...form, slug: e.target.value })}
-            />
-          </Field>
           <Field label="名称">
             <LocaleFields
               values={{ zh: form.nameZh, en: form.nameEn, ms: form.nameMs }}
@@ -298,6 +359,21 @@ export default function AdminCategoriesPage() {
           />
         </Section>
         <Section title="展示">
+          <Field label="销售类型">
+            <Select
+              value={form.saleType}
+              onChange={(saleType) =>
+                setForm({
+                  ...form,
+                  saleType: saleType as "direct" | "custom",
+                })
+              }
+              options={[
+                { value: "custom", label: "定制分类（委托申请）" },
+                { value: "direct", label: "直售分类（购物车结算）" },
+              ]}
+            />
+          </Field>
           <Field label="展示模式">
             <Select
               value={form.displayMode}

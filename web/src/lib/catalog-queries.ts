@@ -11,6 +11,8 @@ import type {
   Collection,
   DisplayMode,
   HeroSlideView,
+  HomeCategoryBlock,
+  HomeSaleSection,
   Product as ProductView,
   ProductVariant as VariantView,
   SaleType,
@@ -80,7 +82,7 @@ export function mapProduct(
     keywords: parseKeywords(product.keywords),
     inStock: product.inStock,
     displayMode: product.category.displayMode as DisplayMode,
-    saleType: product.saleType as SaleType,
+    saleType: (product.category.saleType || product.saleType) as SaleType,
   };
 }
 
@@ -105,6 +107,7 @@ export function mapCategory(category: Category, locale: string): Collection {
     }),
     heroImage: category.coverImage,
     displayMode: category.displayMode as DisplayMode,
+    saleType: category.saleType as SaleType,
     showOnHome: category.showOnHome,
     sortOrder: category.sortOrder,
   };
@@ -227,15 +230,93 @@ export async function listHeroSlides(locale: string) {
   return rows.map((row) => mapHeroSlide(row, locale));
 }
 
+function homeCopy(locale: string, saleType: SaleType) {
+  if (saleType === "direct") {
+    return {
+      eyebrow:
+        locale === "zh"
+          ? "直售作品"
+          : locale === "ms"
+            ? "Jualan terus"
+            : "Ready to ship",
+      title:
+        locale === "zh"
+          ? "选好就带走的温柔"
+          : locale === "ms"
+            ? "Pilih dan bawa pulang"
+            : "Choose and take home",
+    };
+  }
+  return {
+    eyebrow:
+      locale === "zh"
+        ? "定制作品"
+        : locale === "ms"
+          ? "Komisen"
+          : "Commissions",
+    title:
+      locale === "zh"
+        ? "为它留下一份温度"
+        : locale === "ms"
+          ? "Kenangan yang hangat"
+          : "A keepsake of warmth",
+  };
+}
+
 export async function getHomePayload(locale: string) {
-  const [categories, slides, products] = await Promise.all([
-    listHomeCategories(locale),
+  const [slides, categoryRows] = await Promise.all([
     listHeroSlides(locale),
-    listProducts(locale),
+    prisma.category.findMany({
+      where: { isActive: true, showOnHome: true },
+      include: {
+        products: {
+          where: { isActive: true },
+          include: { variants: true, category: true },
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+        },
+      },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+    }),
   ]);
 
+  const categories = categoryRows.map((row) => mapCategoryEntry(row, locale));
+
+  function blocksFor(saleType: SaleType): HomeCategoryBlock[] {
+    return categoryRows
+      .filter((row) => row.saleType === saleType && row.products.length > 0)
+      .map((row) => ({
+        category: mapCategory(row, locale),
+        products: row.products.map((product) =>
+          mapProduct(
+            { ...product, category: row },
+            locale,
+          ),
+        ),
+      }));
+  }
+
+  const customCopy = homeCopy(locale, "custom");
+  const directCopy = homeCopy(locale, "direct");
+
+  const custom: HomeSaleSection = {
+    saleType: "custom",
+    eyebrow: customCopy.eyebrow,
+    title: customCopy.title,
+    blocks: blocksFor("custom"),
+  };
+  const direct: HomeSaleSection = {
+    saleType: "direct",
+    eyebrow: directCopy.eyebrow,
+    title: directCopy.title,
+    blocks: blocksFor("direct"),
+  };
+
+  // Backward-compatible flat lists (API / older callers)
+  const products = [...custom.blocks, ...direct.blocks].flatMap(
+    (block) => block.products,
+  );
   const featured = products.filter((p) => p.displayMode === "featured");
   const grid = products.filter((p) => p.displayMode !== "featured");
 
-  return { categories, slides, featured, grid, products };
+  return { categories, slides, custom, direct, featured, grid, products };
 }

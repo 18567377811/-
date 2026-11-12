@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { ContactUsButton } from "@/components/layout/social";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
+import { startStripeCheckout } from "@/lib/checkout-client";
 import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
@@ -15,6 +17,8 @@ export function AddToCartForm({ product }: { product: Product }) {
   const [variantId, setVariantId] = useState(product.variants[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [buying, setBuying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const isCustom = product.saleType !== "direct";
 
   const selected = useMemo(
@@ -36,14 +40,39 @@ export function AddToCartForm({ product }: { product: Product }) {
             ? "定制商品需先提交委托申请，确认方案后再付款。"
             : "Custom commissions start with a request form — no charge until you approve the plan."}
         </p>
-        <Link
-          href={`/commission/${product.slug}`}
-          className="btn-primary inline-flex min-w-40"
-        >
-          {locale === "zh" ? "开始定制申请" : "Start commission request"}
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <ContactUsButton className="btn-secondary inline-flex min-w-36" />
+          <Link
+            href={`/commission/${product.slug}`}
+            className="btn-primary inline-flex min-w-40"
+          >
+            {t("products.startCommission")}
+          </Link>
+        </div>
       </div>
     );
+  }
+
+  async function buyNow() {
+    if (!selected || buying) return;
+    setError(null);
+    setBuying(true);
+    try {
+      await startStripeCheckout({
+        items: [
+          {
+            productId: product.id,
+            variantId: selected.id,
+            quantity,
+          },
+        ],
+        locale,
+        cancelPath: `/products/${product.slug}`,
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("products.buying"));
+      setBuying(false);
+    }
   }
 
   return (
@@ -102,10 +131,21 @@ export function AddToCartForm({ product }: { product: Product }) {
             {formatUsd(selected?.priceUsd ?? product.priceFromUsd, locale)}
           </p>
         </div>
-        <button type="submit" className="btn-primary min-w-40">
-          {added ? "✓" : t("products.addToCart")}
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button type="submit" className="btn-secondary min-w-36">
+            {added ? "✓" : t("products.addToCart")}
+          </button>
+          <button
+            type="button"
+            className="btn-primary min-w-36"
+            disabled={buying || !selected}
+            onClick={() => void buyNow()}
+          >
+            {buying ? t("products.buying") : t("products.buyNow")}
+          </button>
+        </div>
       </div>
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
     </form>
   );
 }

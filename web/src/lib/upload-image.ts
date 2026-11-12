@@ -90,12 +90,21 @@ async function uploadCatbox(
   return { url: text, provider: "catbox" };
 }
 
+function looksLikeImage(file: File): boolean {
+  if (file.type.startsWith("image/")) return true;
+  // Some browsers (esp. HEIC / drag-drop) leave type empty — fall back to extension.
+  return /\.(jpe?g|png|gif|webp|avif|bmp|heic|heif)$/i.test(file.name);
+}
+
 export async function uploadImageFile(file: File): Promise<{
   url: string;
   provider: UploadProvider;
 }> {
-  if (!file.type.startsWith("image/")) {
+  if (!looksLikeImage(file)) {
     throw new Error("仅支持图片文件");
+  }
+  if (file.size <= 0) {
+    throw new Error("文件为空");
   }
   if (file.size > MAX_BYTES) {
     throw new Error("图片需小于 8MB");

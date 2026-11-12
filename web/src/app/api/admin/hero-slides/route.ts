@@ -16,18 +16,24 @@ export async function GET() {
 export async function POST(request: Request) {
   return withAdmin(async () => {
     const body = await request.json();
-    if (!body?.image || !body?.titleZh || !body?.titleEn) {
-      throw badRequest("缺少必填字段");
+    if (!body?.image || !body?.titleZh) {
+      throw badRequest("缺少必填字段（图片、中文标题）");
     }
+    const titleZh = String(body.titleZh);
+    const titleEn = String(body.titleEn || titleZh);
+    const titleMs = String(body.titleMs || titleEn);
+    const bodyZh = String(body.bodyZh ?? "");
+    const bodyEn = String(body.bodyEn || bodyZh);
+    const bodyMs = String(body.bodyMs || bodyEn);
     const slide = await prisma.heroSlide.create({
       data: {
         image: String(body.image),
-        titleZh: String(body.titleZh),
-        titleEn: String(body.titleEn),
-        titleMs: String(body.titleMs ?? body.titleEn),
-        bodyZh: String(body.bodyZh ?? ""),
-        bodyEn: String(body.bodyEn ?? ""),
-        bodyMs: String(body.bodyMs ?? ""),
+        titleZh,
+        titleEn,
+        titleMs,
+        bodyZh,
+        bodyEn,
+        bodyMs,
         sortOrder: Number(body.sortOrder ?? 0),
         isActive: body.isActive !== false,
       },
