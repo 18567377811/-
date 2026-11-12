@@ -128,7 +128,7 @@ cd "d:\0-Xiangmu\宠物毛毡"
 ```
 
 - 管理后台在同一 Next 应用：`https://thestoryofawool.me/admin`（无需改 Nginx；PC / 手机均可）。
-- **SQLite**：`/var/www/feltora/shared/data/feltora.db`（发版不丢）。`workbench-update.sh` 会 `prisma migrate deploy` + 幂等 seed。
+- **SQLite**：`/var/www/feltora/shared/data/feltora.db`（发版不丢）。`workbench-update.sh` 用 **`prisma db push`（幂等）** + seed，避免 `migrate deploy` 与历史 `db push` 撞车导致 `duplicate column`。
 - **shared/.env** 需含（模板见 `web/.env.example`）：
   - `DATABASE_URL="file:/var/www/feltora/shared/data/feltora.db"`
   - `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`

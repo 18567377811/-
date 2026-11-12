@@ -77,6 +77,21 @@ if [[ -f "$SHARED_ENV" ]]; then
   fi
 fi
 
+# ---------- 构建失败时尽量把旧站拉起来，避免长时间 502 ----------
+restore_app_on_fail() {
+  local code=$?
+  if [[ $code -ne 0 ]] && command -v pm2 >/dev/null 2>&1; then
+    echo "==> build/deploy failed (exit $code); trying to restart previous app"
+    if [[ -L "$REMOTE_ROOT/app" || -f "$REMOTE_ROOT/app/server.js" ]]; then
+      env PORT="$APP_PORT" HOSTNAME=0.0.0.0 NODE_ENV=production \
+        pm2 start "$REMOTE_ROOT/app/server.js" --name "$APP_NAME" --cwd "$REMOTE_ROOT/app" --update-env >/dev/null 2>&1 \
+        || pm2 restart "$APP_NAME" --update-env >/dev/null 2>&1 \
+        || true
+    fi
+  fi
+}
+trap restore_app_on_fail EXIT
+
 # ---------- 构建（2G 机：先停应用腾内存，再低并发装依赖）----------
 echo "==> free RAM: stop pm2 app before npm ci"
 if command -v pm2 >/dev/null 2>&1; then
@@ -87,15 +102,21 @@ sync
 echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 free -h || true
 
-echo "==> npm ci + prisma migrate + build (may take a few minutes on 2G)"
+echo "==> npm ci + prisma schema sync + build (may take a few minutes on 2G)"
 cd "$WEB_DIR"
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}"
 # 降低并发，减少 npm ci 峰值内存
 npm ci --no-audit --no-fund --maxsockets 1
 
-# 迁移指向持久库（构建前先同步 schema）
+# SQLite 生产库：用 db push（幂等）同步 schema。
+# 不要用 migrate deploy —— 若曾手动 db push / 列已存在，会报 duplicate column 并把迁移卡死。
 export DATABASE_URL="file:$DB_FILE"
-npx prisma migrate deploy
+echo "==> prisma db push (idempotent schema sync)"
+npx prisma db push --skip-generate
+# 若历史上有失败的 migrate 记录，标记为已应用，避免下次误再跑
+npx prisma migrate resolve --applied 20261112143000_category_sale_type >/dev/null 2>&1 || true
+npx prisma migrate resolve --applied 20261112230000_regions_json >/dev/null 2>&1 || true
+
 if [[ ! -f "$DB_FILE" ]] || [[ ! -s "$DB_FILE" ]]; then
   echo "==> seed empty database"
   npx tsx prisma/seed.ts || true

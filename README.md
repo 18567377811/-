@@ -90,7 +90,9 @@ bash /var/www/feltora/deploy/workbench-update.sh
 bash /var/www/feltora/deploy/workbench-update.sh --ssl
 ```
 
-脚本会：`git pull` → `npm ci` → `build`（standalone）→ 发布到 `/var/www/feltora/app` → `pm2 restart feltora`。
+脚本会：`git pull` → `npm ci` → **`prisma db push`（幂等同步库结构）** → `build` → 发布 → `pm2` 用 `HOSTNAME=0.0.0.0` 启动。
+
+> **为何以前会挂站？** 发版脚本曾用 `prisma migrate deploy`。线上若已用 `db push` 加过列（如 `Category.saleType`），再跑迁移会报 `duplicate column`，迁移失败后站点未重启 → 502。现已改为 `db push`，并在失败时尝试拉起旧进程。
 
 更细的说明（安全组、域名实名、排错）见 [`deploy/DEPLOY.md`](deploy/DEPLOY.md)。
 
