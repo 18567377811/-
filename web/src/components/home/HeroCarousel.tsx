@@ -75,7 +75,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
   return (
     <section
       ref={heroRef}
-      className="group/hero relative w-full overflow-hidden"
+      className="group/hero relative mx-auto w-full max-w-[1200px] overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={(event) => {
@@ -113,7 +113,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
               fill
               priority={i === 0 || i === index}
               className="object-cover"
-              sizes="100vw"
+              sizes="(max-width: 1200px) 100vw, 1200px"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-[#2b211c]/75 via-[#2b211c]/25 to-transparent" />
           </div>
@@ -121,25 +121,25 @@ export function HeroCarousel({ slides }: { slides: HeroSlideView[] }) {
 
         <div
           key={current.id}
-          className="absolute inset-x-0 bottom-0 z-10 px-4 pb-8 pt-16 sm:px-8 sm:pb-10 lg:px-12"
+          className="absolute inset-x-0 bottom-0 z-10 px-[4%] pb-[7%] pt-[12%] sm:px-8 sm:pb-10 lg:px-12"
         >
           <p
-            className={`${revealClass(heroVisible, "reveal")} text-[10px] tracking-[0.22em] text-white/75 uppercase sm:text-xs`}
+            className={`${revealClass(heroVisible, "reveal")} text-[clamp(0.625rem,0.5rem+0.4vw,0.75rem)] tracking-[0.22em] text-white/75 uppercase`}
           >
             {t("brand.name")}
           </p>
           <h1
-            className={`${revealClass(heroVisible, "reveal")} mt-2 max-w-xl font-display text-3xl leading-tight text-white sm:text-5xl`}
+            className={`${revealClass(heroVisible, "reveal")} mt-[0.4em] max-w-[min(36rem,92%)] font-display text-[clamp(1.25rem,0.85rem+2.8vw,3rem)] leading-[1.22] text-white text-balance`}
           >
             {current.title}
           </h1>
           <p
-            className={`${revealClass(heroVisible, "reveal-delay")} mt-2 max-w-lg text-sm leading-relaxed text-white/85 sm:text-base`}
+            className={`${revealClass(heroVisible, "reveal-delay")} mt-[0.55em] max-w-[min(32rem,95%)] text-[clamp(0.78rem,0.68rem+0.55vw,1rem)] leading-relaxed text-white/85`}
           >
             {current.body}
           </p>
           <p
-            className={`${revealClass(heroVisible, "reveal-delay")} mt-3 text-xs text-[#f0d2c4] sm:text-sm`}
+            className={`${revealClass(heroVisible, "reveal-delay")} mt-[0.7em] text-[clamp(0.7rem,0.62rem+0.35vw,0.875rem)] text-[#f0d2c4]`}
           >
             {t("home.limited")}
           </p>

@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { StarIcon } from "@/components/layout/HeaderIcons";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
-import { formatUsd } from "@/lib/money";
+import { useRegion } from "@/components/layout/RegionProvider";
 import type { Product } from "@/types/commerce";
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
 
 export function SearchProductCard({ product, index, animKey }: Props) {
   const t = useTranslations();
-  const locale = useLocale();
+  const { formatPrice } = useRegion();
   const { ref, visible } = useRevealOnView<HTMLAnchorElement>({
     // Re-run when filter results remount via key on parent grid
     threshold: 0.12,
@@ -48,7 +48,7 @@ export function SearchProductCard({ product, index, animKey }: Props) {
           {product.name}
         </h3>
         <p className="text-xs text-ink-soft sm:text-sm">
-          {t("products.from")} {formatUsd(product.priceFromUsd, locale)}
+          {t("products.from")} {formatPrice(product.priceFromUsd)}
         </p>
         {typeof product.rating === "number" ? (
           <p className="flex items-center gap-1 text-xs text-ink-soft">

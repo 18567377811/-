@@ -102,6 +102,8 @@ export async function PUT(request: Request) {
           body.social != null ? JSON.stringify(body.social) : undefined,
         thanksJson:
           body.thanks != null ? JSON.stringify(body.thanks) : undefined,
+        regionsJson:
+          body.regions != null ? JSON.stringify(body.regions) : undefined,
       },
     });
     return { config };

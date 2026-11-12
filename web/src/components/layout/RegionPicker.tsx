@@ -5,12 +5,8 @@ import { createPortal } from "react-dom";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
+import { useRegion } from "@/components/layout/RegionProvider";
 import { CloseIcon } from "./HeaderIcons";
-import {
-  REGION_OPTIONS,
-  REGION_STORAGE_KEY,
-  defaultRegionIdForLocale,
-} from "./regions";
 
 type Props = {
   open: boolean;
@@ -22,27 +18,12 @@ export function RegionPicker({ open, onClose }: Props) {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const { regions, region, setRegionId } = useRegion();
   const [mounted, setMounted] = useState(false);
-  const [selectedId, setSelectedId] = useState(() =>
-    defaultRegionIdForLocale(locale),
-  );
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(REGION_STORAGE_KEY);
-      if (saved && REGION_OPTIONS.some((r) => r.id === saved)) {
-        setSelectedId(saved);
-        return;
-      }
-    } catch {
-      /* ignore */
-    }
-    setSelectedId(defaultRegionIdForLocale(locale));
-  }, [locale]);
 
   useEffect(() => {
     if (!open) return;
@@ -62,7 +43,6 @@ export function RegionPicker({ open, onClose }: Props) {
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6">
-      {/* Mask — click to close */}
       <button
         type="button"
         className="absolute inset-0 cursor-pointer border-0 bg-black/50 backdrop-blur-[1px]"
@@ -95,10 +75,10 @@ export function RegionPicker({ open, onClose }: Props) {
         </div>
 
         <ul className="flex-1 overflow-y-auto overscroll-contain px-3 py-2">
-          {REGION_OPTIONS.map((region) => {
-            const active = region.id === selectedId;
+          {regions.map((item) => {
+            const active = item.id === region.id;
             return (
-              <li key={region.id}>
+              <li key={item.id}>
                 <button
                   type="button"
                   className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition ${
@@ -107,25 +87,24 @@ export function RegionPicker({ open, onClose }: Props) {
                       : "bg-transparent hover:bg-[#f7efe6]/80"
                   }`}
                   onClick={() => {
-                    setSelectedId(region.id);
-                    try {
-                      window.localStorage.setItem(REGION_STORAGE_KEY, region.id);
-                    } catch {
-                      /* ignore */
-                    }
+                    setRegionId(item.id);
                     onClose();
-                    if (region.locale !== locale) {
+                    if (item.locale !== locale) {
                       router.replace(pathname, {
-                        locale: region.locale as AppLocale,
+                        locale: item.locale as AppLocale,
                       });
                     }
                   }}
                 >
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#efe4d8] text-[11px] font-semibold tracking-wide text-ink">
-                    {region.code}
+                    {item.code}
                   </span>
-                  <span className="text-[15px] leading-snug text-[#5c6b70]">
-                    {region.label}
+                  <span className="min-w-0 flex-1 text-[15px] leading-snug text-[#5c6b70]">
+                    <span className="block truncate">{item.label}</span>
+                    <span className="mt-0.5 block text-[12px] text-[#8a7b72]">
+                      {item.currencySymbol} · {item.currencyCode} · ×
+                      {item.exchangeRate}
+                    </span>
                   </span>
                 </button>
               </li>

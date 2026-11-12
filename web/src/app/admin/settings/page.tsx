@@ -10,6 +10,7 @@ import {
   ItemCard,
   LocaleFields,
   Section,
+  Select,
   Toggle,
 } from "@/components/admin/ui";
 import {
@@ -17,6 +18,13 @@ import {
   triple,
   type LocaleSyncItem,
 } from "@/lib/admin-locale-sync";
+import {
+  DEFAULT_REGIONS,
+  LOCALE_OPTIONS,
+  TRANSLATE_LANG_OPTIONS,
+  parseRegionsJson,
+  type RegionConfig,
+} from "@/lib/regions-config";
 import {
   DEFAULT_THANKS,
   parseThanksContent,
@@ -41,6 +49,7 @@ type Faq = {
   aMs: string;
 };
 type Social = { id: string; label: string; href: string; enabled: boolean };
+type RegionForm = RegionConfig;
 
 type FormState = {
   logoUrl: string;
@@ -75,7 +84,22 @@ type FormState = {
   faq: Faq[];
   social: Social[];
   thanks: ThanksContent;
+  regions: RegionForm[];
 };
+
+function emptyRegion(): RegionForm {
+  return {
+    id: `r-${Date.now().toString(36)}`,
+    code: "XX",
+    label: "新地区",
+    locale: "en",
+    translateLang: "en",
+    currencyCode: "USD",
+    currencySymbol: "$",
+    exchangeRate: 1,
+    enabled: true,
+  };
+}
 
 const emptyTip = (): Tip => ({ zh: "", en: "", ms: "" });
 const emptyStep = (): Step => ({
@@ -512,6 +536,7 @@ export default function AdminSettingsPage() {
       faq: JSON.parse(c.faqJson || "[]") as Faq[],
       social: JSON.parse(c.socialJson || "[]") as Social[],
       thanks: parseThanksContent(c.thanksJson),
+      regions: parseRegionsJson(c.regionsJson || "[]"),
     };
     baselineRef.current = structuredClone(next);
     setForm(next);
@@ -604,6 +629,180 @@ export default function AdminSettingsPage() {
               onChange={(logoUrl) => setForm({ ...form, logoUrl })}
             />
           </Field>
+        </Section>
+
+        <Section title="地区 / 货币 / 汇率" collapsible defaultOpen={false}>
+          <p className="text-[12px] leading-relaxed text-[var(--ios-secondary)]">
+            商品价格按 <strong>USD</strong> 录入；切换地区后展示价 = USD ×
+            汇率，并使用对应货币符号。翻译标识供自动翻译接口使用。
+          </p>
+          <div className="space-y-3">
+            {form.regions.map((region, index) => (
+              <ItemCard
+                key={region.id}
+                title={`${region.code} · ${region.label}`}
+                action={
+                  form.regions.length > 1 ? (
+                    <button
+                      type="button"
+                      className="admin-icon-btn admin-icon-btn-danger"
+                      aria-label="删除地区"
+                      onClick={() =>
+                        setForm({
+                          ...form,
+                          regions: form.regions.filter((_, i) => i !== index),
+                        })
+                      }
+                    >
+                      <IconTrash className="h-4 w-4" />
+                    </button>
+                  ) : null
+                }
+              >
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field label="短码">
+                    <input
+                      className="admin-input"
+                      value={region.code}
+                      onChange={(e) => {
+                        const regions = [...form.regions];
+                        regions[index] = {
+                          ...region,
+                          code: e.target.value.toUpperCase(),
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                    />
+                  </Field>
+                  <Field label="展示名称">
+                    <input
+                      className="admin-input"
+                      value={region.label}
+                      onChange={(e) => {
+                        const regions = [...form.regions];
+                        regions[index] = { ...region, label: e.target.value };
+                        setForm({ ...form, regions });
+                      }}
+                    />
+                  </Field>
+                  <Field label="站点语言">
+                    <Select
+                      value={region.locale}
+                      onChange={(locale) => {
+                        const regions = [...form.regions];
+                        regions[index] = {
+                          ...region,
+                          locale: locale as RegionForm["locale"],
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                      options={LOCALE_OPTIONS.map((o) => ({
+                        value: o.value,
+                        label: o.label,
+                      }))}
+                    />
+                  </Field>
+                  <Field label="翻译标识">
+                    <Select
+                      value={region.translateLang}
+                      onChange={(translateLang) => {
+                        const regions = [...form.regions];
+                        regions[index] = { ...region, translateLang };
+                        setForm({ ...form, regions });
+                      }}
+                      options={TRANSLATE_LANG_OPTIONS}
+                    />
+                  </Field>
+                  <Field label="货币代码">
+                    <input
+                      className="admin-input"
+                      value={region.currencyCode}
+                      onChange={(e) => {
+                        const regions = [...form.regions];
+                        regions[index] = {
+                          ...region,
+                          currencyCode: e.target.value.toUpperCase(),
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                    />
+                  </Field>
+                  <Field label="货币符号">
+                    <input
+                      className="admin-input"
+                      value={region.currencySymbol}
+                      onChange={(e) => {
+                        const regions = [...form.regions];
+                        regions[index] = {
+                          ...region,
+                          currencySymbol: e.target.value,
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                    />
+                  </Field>
+                  <Field label="汇率（相对 1 USD）">
+                    <input
+                      className="admin-input"
+                      type="number"
+                      min={0.0001}
+                      step="0.0001"
+                      value={region.exchangeRate}
+                      onChange={(e) => {
+                        const regions = [...form.regions];
+                        const n = Number(e.target.value);
+                        regions[index] = {
+                          ...region,
+                          exchangeRate: Number.isFinite(n) && n > 0 ? n : 1,
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                    />
+                  </Field>
+                  <Field label="启用状态">
+                    <Select
+                      value={region.enabled !== false ? "1" : "0"}
+                      onChange={(value) => {
+                        const regions = [...form.regions];
+                        regions[index] = {
+                          ...region,
+                          enabled: value === "1",
+                        };
+                        setForm({ ...form, regions });
+                      }}
+                      options={[
+                        { value: "1", label: "启用" },
+                        { value: "0", label: "停用" },
+                      ]}
+                    />
+                  </Field>
+                </div>
+              </ItemCard>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-2 pt-1">
+            <button
+              type="button"
+              className="admin-btn admin-btn-primary"
+              onClick={() =>
+                setForm({ ...form, regions: [...form.regions, emptyRegion()] })
+              }
+            >
+              <IconPlus className="h-4 w-4" /> 添加地区
+            </button>
+            <button
+              type="button"
+              className="admin-btn admin-btn-secondary"
+              onClick={() =>
+                setForm({
+                  ...form,
+                  regions: DEFAULT_REGIONS.map((r) => ({ ...r })),
+                })
+              }
+            >
+              恢复默认三区
+            </button>
+          </div>
         </Section>
 
         <Section title="政策页（富文本）" collapsible defaultOpen={false}>

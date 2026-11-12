@@ -1,0 +1,45 @@
+[root@iZj6cdi8oaxbpgqkp4hk63Z app]# pm2 logs feltora --lines 20 --nostream
+[TAILING] Tailing last 20 lines for [feltora] process (change the value with --lines option)
+/root/.pm2/logs/feltora-error.log last 20 lines:
+0|feltora  |   code: 'ENOTFOUND',
+0|feltora  |   syscall: 'getaddrinfo',
+0|feltora  |   hostname: 'iZj6cdi8oaxbpgqkp4hk63Z'
+0|feltora  | }
+0|feltora  | ⨯ Failed to start server
+0|feltora  | Error: getaddrinfo ENOTFOUND iZj6cdi8oaxbpgqkp4hk63Z
+0|feltora  |     at ignore-listed frames {
+0|feltora  |   errno: -3008,
+0|feltora  |   code: 'ENOTFOUND',
+0|feltora  |   syscall: 'getaddrinfo',
+0|feltora  |   hostname: 'iZj6cdi8oaxbpgqkp4hk63Z'
+0|feltora  | }
+0|feltora  | ⨯ Failed to start server
+0|feltora  | Error: getaddrinfo ENOTFOUND iZj6cdi8oaxbpgqkp4hk63Z
+0|feltora  |     at ignore-listed frames {
+0|feltora  |   errno: -3008,
+0|feltora  |   code: 'ENOTFOUND',
+0|feltora  |   syscall: 'getaddrinfo',
+0|feltora  |   hostname: 'iZj6cdi8oaxbpgqkp4hk63Z'
+0|feltora  | }
+
+/root/.pm2/logs/feltora-out.log last 20 lines:
+0|feltora  | ▲ Next.js 16.4.5
+0|feltora  | - Local:         http://localhost:3000
+0|feltora  | - Network:       http://0.0.0.0:3000
+0|feltora  | ✓ Ready in 0ms
+0|feltora  | ✓ Running next.config took 2ms
+0|feltora  | ▲ Next.js 16.4.5
+0|feltora  | - Local:         http://localhost:3000
+0|feltora  | - Network:       http://0.0.0.0:3000
+0|feltora  | ✓ Ready in 0ms
+0|feltora  | ✓ Running next.config took 1.5ms
+0|feltora  | ▲ Next.js 16.4.5
+0|feltora  | - Local:         http://localhost:3000
+0|feltora  | - Network:       http://0.0.0.0:3000
+0|feltora  | ✓ Ready in 0ms
+0|feltora  | ✓ Running next.config took 1.6ms
+0|feltora  | ▲ Next.js 16.4.5
+0|feltora  | - Local:         http://localhost:3000
+0|feltora  | - Network:       http://0.0.0.0:3000
+0|feltora  | ✓ Ready in 0ms
+0|feltora  | ✓ Running next.config took 2ms

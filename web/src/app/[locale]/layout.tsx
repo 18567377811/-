@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { RegionProvider } from "@/components/layout/RegionProvider";
 import { SocialContactProvider } from "@/components/layout/social";
 import { routing } from "@/i18n/routing";
 import { getLocalizedSiteContent } from "@/lib/site-config";
@@ -72,11 +73,13 @@ export default async function LocaleLayout({ children, params }: Props) {
       }
     >
       <NextIntlClientProvider messages={messages}>
-        <SocialContactProvider links={site.social}>
-          <SiteHeader siteTitle={site.siteTitle} logoUrl={site.logoUrl} />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
-        </SocialContactProvider>
+        <RegionProvider regions={site.regions}>
+          <SocialContactProvider links={site.social}>
+            <SiteHeader siteTitle={site.siteTitle} logoUrl={site.logoUrl} />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </SocialContactProvider>
+        </RegionProvider>
       </NextIntlClientProvider>
     </div>
   );

@@ -5,14 +5,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ContactUsButton } from "@/components/layout/social";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
+import { useRegion } from "@/components/layout/RegionProvider";
 import { startStripeCheckout } from "@/lib/checkout-client";
-import { formatUsd } from "@/lib/money";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
 
 export function AddToCartForm({ product }: { product: Product }) {
   const t = useTranslations();
   const locale = useLocale();
+  const { formatPrice } = useRegion();
   const addItem = useCartStore((state) => state.addItem);
   const [variantId, setVariantId] = useState(product.variants[0]?.id ?? "");
   const [quantity, setQuantity] = useState(1);
@@ -32,7 +33,7 @@ export function AddToCartForm({ product }: { product: Product }) {
         <div>
           <p className="text-sm text-ink-soft">{t("products.from")}</p>
           <p className="font-display text-3xl">
-            {formatUsd(product.priceFromUsd, locale)}
+            {formatPrice(product.priceFromUsd)}
           </p>
         </div>
         <p className="text-sm leading-relaxed text-ink-soft">
@@ -128,7 +129,7 @@ export function AddToCartForm({ product }: { product: Product }) {
         <div>
           <p className="text-sm text-ink-soft">{t("products.from")}</p>
           <p className="font-display text-3xl">
-            {formatUsd(selected?.priceUsd ?? product.priceFromUsd, locale)}
+            {formatPrice(selected?.priceUsd ?? product.priceFromUsd)}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">

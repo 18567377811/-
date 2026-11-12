@@ -1,6 +1,11 @@
 import { prisma } from "@/lib/db";
 import { pickLocale } from "@/lib/locale-text";
 import {
+  DEFAULT_REGIONS,
+  enabledRegions,
+  parseRegionsJson,
+} from "@/lib/regions-config";
+import {
   DEFAULT_THANKS,
   parseThanksContent,
   pickThanksPair,
@@ -169,6 +174,7 @@ export async function ensureSiteConfig() {
       faqJson: JSON.stringify(DEFAULT_FAQ),
       socialJson: JSON.stringify(DEFAULT_SOCIAL),
       thanksJson: JSON.stringify(DEFAULT_THANKS),
+      regionsJson: JSON.stringify(DEFAULT_REGIONS),
       policyRefundEn:
         "<p>Refund requests are reviewed case by case for custom commissions.</p>",
       policyRefundZh: "<p>定制商品退款将按个案审核处理。</p>",
@@ -204,12 +210,19 @@ export async function getLocalizedSiteContent(locale: string) {
   const social = parseJson<SocialLink[]>(config.socialJson, DEFAULT_SOCIAL).filter(
     (item) => item.enabled !== false,
   );
+  const regionsRaw = parseRegionsJson(
+    (config as { regionsJson?: string }).regionsJson,
+  );
+  const regions = enabledRegions(
+    regionsRaw.length ? regionsRaw : DEFAULT_REGIONS,
+  );
 
   return {
     config,
     logoUrl: config.logoUrl,
     siteTitle: config.siteTitle,
     themeAccent: config.themeAccent,
+    regions,
     photoGuide: {
       title: pickLocale(locale, {
         zh: config.photoGuideTitleZh,

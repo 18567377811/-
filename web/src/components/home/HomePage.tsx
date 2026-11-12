@@ -16,11 +16,11 @@ export async function HomePage() {
       <HeroCarousel slides={slides} />
       <ProductShowcase sections={[custom, direct]} />
 
-      <section className="mt-12 px-4 sm:mt-16 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-6">
-        <h2 className="font-display text-2xl text-ink sm:text-3xl">
+      <section className="mx-auto mt-12 w-full max-w-[1200px] px-[4%] sm:mt-16 sm:px-6">
+        <h2 className="font-display text-[clamp(1.35rem,1.1rem+1.2vw,1.875rem)] text-ink">
           {site.process.title}
         </h2>
-        <p className="mt-2 max-w-2xl text-sm text-ink-soft sm:text-base">
+        <p className="mt-2 max-w-2xl text-[clamp(0.8125rem,0.75rem+0.35vw,1rem)] text-ink-soft">
           {site.process.body}
         </p>
         <ol className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2">
@@ -43,8 +43,8 @@ export async function HomePage() {
         </ol>
       </section>
 
-      <section className="mt-12 px-4 sm:mt-16 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-6">
-        <h2 className="font-display text-2xl text-ink sm:text-3xl">
+      <section className="mx-auto mt-12 w-full max-w-[1200px] px-[4%] sm:mt-16 sm:px-6">
+        <h2 className="font-display text-[clamp(1.35rem,1.1rem+1.2vw,1.875rem)] text-ink">
           {locale === "zh" ? "常见问题" : "FAQ"}
         </h2>
         <div className="mt-4 divide-y divide-line overflow-hidden rounded-2xl bg-white shadow-[var(--shadow)] ring-1 ring-[color:var(--line)]">

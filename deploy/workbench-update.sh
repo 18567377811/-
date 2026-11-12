@@ -77,10 +77,21 @@ if [[ -f "$SHARED_ENV" ]]; then
   fi
 fi
 
-# ---------- 构建 ----------
+# ---------- 构建（2G 机：先停应用腾内存，再低并发装依赖）----------
+echo "==> free RAM: stop pm2 app before npm ci"
+if command -v pm2 >/dev/null 2>&1; then
+  pm2 stop "$APP_NAME" >/dev/null 2>&1 || true
+fi
+# 丢掉 page cache，尽量给 npm/node 腾出物理内存
+sync
+echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+free -h || true
+
 echo "==> npm ci + prisma migrate + build (may take a few minutes on 2G)"
 cd "$WEB_DIR"
-npm ci
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=1536}"
+# 降低并发，减少 npm ci 峰值内存
+npm ci --no-audit --no-fund --maxsockets 1
 
 # 迁移指向持久库（构建前先同步 schema）
 export DATABASE_URL="file:$DB_FILE"
@@ -151,17 +162,23 @@ readlink -f "$APP_LINK"
 
 # ---------- PM2 ----------
 # 必须 delete 再 start：仅 restart 时 PM2 可能仍占用旧 release 的真实路径
+# 注意：阿里云 ECS 的 shell HOSTNAME=实例名，Next standalone 会拿它去 bind → ENOTFOUND
+# 所以必须在 source .env 之后强制改回 0.0.0.0
 echo "==> pm2 (recreate process on latest release)"
-export PORT="$APP_PORT" HOSTNAME=0.0.0.0 NODE_ENV=production
 if [[ -f "$SHARED_ENV" ]]; then
   set -a
   # shellcheck disable=SC1090
   source "$SHARED_ENV"
   set +a
 fi
+export PORT="$APP_PORT"
+export HOSTNAME=0.0.0.0
+export NODE_ENV=production
 pm2 delete "$APP_NAME" >/dev/null 2>&1 || true
 cd "$APP_LINK"
-pm2 start server.js --name "$APP_NAME" --cwd "$APP_LINK"
+# 用 env 显式传入，避免 pm2 继承错误的系统 HOSTNAME
+env PORT="$APP_PORT" HOSTNAME=0.0.0.0 NODE_ENV=production \
+  pm2 start server.js --name "$APP_NAME" --cwd "$APP_LINK" --update-env
 pm2 save
 
 # 只保留最近 5 个版本

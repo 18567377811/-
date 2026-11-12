@@ -8,7 +8,7 @@ import { ContactUsButton } from "@/components/layout/social";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
 import { startStripeCheckout } from "@/lib/checkout-client";
 import { cardPlainText } from "@/lib/html-text";
-import { formatUsd } from "@/lib/money";
+import { useRegion } from "@/components/layout/RegionProvider";
 import { useCartStore } from "@/store/cart";
 import type { HomeSaleSection, Product } from "@/types/commerce";
 
@@ -24,9 +24,9 @@ function FeaturedActions({ product }: { product: Product }) {
   const isCustom = product.saleType !== "direct";
 
   const btnSecondary =
-    "btn-secondary btn-compact inline-flex min-w-0 flex-1 basis-[46%] items-center justify-center sm:flex-none";
+    "btn-secondary btn-compact inline-flex min-w-0 flex-1 items-center justify-center sm:flex-none";
   const btnPrimary =
-    "btn-primary btn-compact inline-flex min-w-0 flex-1 basis-[46%] items-center justify-center sm:flex-none";
+    "btn-primary btn-compact inline-flex min-w-0 flex-1 items-center justify-center sm:flex-none";
 
   if (isCustom) {
     return (
@@ -120,7 +120,7 @@ function FeaturedCard({
   index: number;
 }) {
   const t = useTranslations();
-  const locale = useLocale();
+  const { formatPrice } = useRegion();
   const reverse = index % 2 === 1;
   const { ref, visible } = useRevealOnView<HTMLElement>();
   const blurb = cardPlainText(product.summary, product.description);
@@ -155,16 +155,16 @@ function FeaturedCard({
             <p className="text-[11px] tracking-[0.18em] text-accent uppercase sm:text-xs">
               {product.categoryName}
             </p>
-            <h3 className="font-display text-[1.65rem] leading-snug text-ink sm:text-3xl lg:text-4xl">
+            <h3 className="font-display text-[clamp(1.35rem,1rem+2vw,2.25rem)] leading-snug text-balance text-ink">
               {product.name}
             </h3>
             {blurb ? (
-              <p className="mx-auto max-w-md line-clamp-4 text-[15px] leading-relaxed text-ink-soft sm:text-base lg:mx-0">
+              <p className="mx-auto max-w-md line-clamp-4 text-[clamp(0.875rem,0.8rem+0.4vw,1rem)] leading-relaxed text-ink-soft lg:mx-0">
                 {blurb}
               </p>
             ) : null}
-            <p className="font-display text-[1.65rem] text-accent sm:text-3xl">
-              {t("products.from")} {formatUsd(product.priceFromUsd, locale)}
+            <p className="font-display text-[clamp(1.35rem,1rem+2vw,1.875rem)] text-accent">
+              {t("products.from")} {formatPrice(product.priceFromUsd)}
             </p>
             <p className="text-sm text-ink-soft">
               {t("products.turnaround")}: {product.turnaroundMonths}{" "}
@@ -183,7 +183,7 @@ function FeaturedCard({
 
 function GridCard({ product, index }: { product: Product; index: number }) {
   const t = useTranslations();
-  const locale = useLocale();
+  const { formatPrice } = useRegion();
   const { ref, visible } = useRevealOnView<HTMLElement>();
 
   return (
@@ -208,21 +208,21 @@ function GridCard({ product, index }: { product: Product; index: number }) {
           sizes="(max-width: 640px) 50vw, 280px"
         />
       </Link>
-      <div className="space-y-2 bg-white px-3 py-3.5 text-center sm:px-4 sm:py-4">
-        <Link href={`/products/${product.slug}`} className="block space-y-1.5">
-          <h3 className="line-clamp-2 font-display text-base leading-snug text-ink sm:text-lg">
+      <div className="space-y-2 bg-white px-[0.65rem] py-3 text-center sm:px-4 sm:py-4">
+        <Link href={`/products/${product.slug}`} className="block space-y-1">
+          <h3 className="card-title-fluid line-clamp-2 font-display text-ink">
             {product.name}
           </h3>
-          <p className="text-sm text-ink-soft sm:text-[15px]">
-            {t("products.from")} {formatUsd(product.priceFromUsd, locale)}
+          <p className="text-[clamp(0.72rem,0.65rem+0.4vw,0.9375rem)] text-ink-soft">
+            {t("products.from")} {formatPrice(product.priceFromUsd)}
           </p>
           {product.rating ? (
-            <p className="text-xs text-honey sm:text-sm">
+            <p className="text-[clamp(0.65rem,0.58rem+0.3vw,0.875rem)] text-honey">
               {product.rating.toFixed(1)} ★
             </p>
           ) : null}
         </Link>
-        <div className="flex w-full flex-row flex-wrap items-center justify-center gap-2 pt-0.5">
+        <div className="flex w-full flex-row items-center justify-center gap-1.5 pt-0.5 sm:gap-2">
           <FeaturedActions product={product} />
         </div>
       </div>
@@ -239,7 +239,7 @@ function SaleSection({ section }: { section: HomeSaleSection }) {
         <p className="text-[10px] tracking-[0.2em] text-accent uppercase">
           {section.eyebrow}
         </p>
-        <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
+        <h2 className="mt-2 font-display text-[clamp(1.35rem,1.1rem+1.2vw,1.875rem)] text-ink">
           {section.title}
         </h2>
       </header>
@@ -329,7 +329,7 @@ export function ProductShowcase({
   if (visible.length === 0) return null;
 
   return (
-    <div className="mt-8 px-4 sm:mt-12 sm:px-6 lg:mx-auto lg:max-w-6xl lg:px-6">
+    <div className="mx-auto mt-8 w-full max-w-[1200px] px-[4%] sm:mt-12 sm:px-6">
       {visible.map((section) => (
         <SaleSection key={section.saleType} section={section} />
       ))}

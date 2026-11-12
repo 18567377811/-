@@ -156,6 +156,8 @@ model SiteConfig {
   faqJson            String   @default("[]")
   socialJson         String   @default("[]")
   thanksJson         String   @default("{}")
+  /** 地区/货币/汇率配置 JSON，见 regions-config.ts */
+  regionsJson        String   @default("[]")
   updatedAt          DateTime @updatedAt
 }
 

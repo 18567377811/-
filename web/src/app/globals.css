@@ -47,6 +47,8 @@
 }
 
 html {
+  /* 小屏略缩小根字号，大屏封顶 16px，整站 rem 随屏宽缩放 */
+  font-size: clamp(13.5px, 0.75rem + 0.55vw, 16px);
   scroll-behavior: smooth;
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -164,16 +166,27 @@ input[type="radio"] {
 }
 
 .btn-compact {
-  padding: 0.55rem 0.85rem;
-  font-size: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.6875rem;
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 @media (min-width: 640px) {
   .btn-compact {
     padding: 0.7rem 1.2rem;
     font-size: 0.875rem;
+    white-space: normal;
   }
+}
+
+/* 商品网格卡标题：流体字号，减少尴尬折行 */
+.card-title-fluid {
+  font-size: clamp(0.78rem, 0.62rem + 1.1vw, 1.05rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-wrap: balance;
 }
 
 @keyframes slide-in-right {

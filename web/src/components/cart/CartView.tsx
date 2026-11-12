@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { startStripeCheckout } from "@/lib/checkout-client";
-import { formatUsd } from "@/lib/money";
+import { useRegion } from "@/components/layout/RegionProvider";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
 
@@ -17,6 +17,7 @@ function lineKey(productId: string, variantId: string) {
 export function CartView({ products }: { products: Product[] }) {
   const t = useTranslations();
   const locale = useLocale();
+  const { formatPrice } = useRegion();
   const items = useCartStore((state) => state.items);
   const removeItem = useCartStore((state) => state.removeItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
@@ -184,7 +185,7 @@ export function CartView({ products }: { products: Product[] }) {
                       <p className="text-sm text-ink-soft">{variant.label}</p>
                     </div>
                     <p className="shrink-0 font-semibold">
-                      {formatUsd(variant.priceUsd * item.quantity, locale)}
+                      {formatPrice(variant.priceUsd * item.quantity)}
                     </p>
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-3">
@@ -217,7 +218,7 @@ export function CartView({ products }: { products: Product[] }) {
         <div className="flex items-center justify-between">
           <span className="text-ink-soft">{t("cart.subtotal")}</span>
           <span className="font-display text-3xl">
-            {formatUsd(subtotal, locale)}
+            {formatPrice(subtotal)}
           </span>
         </div>
         <p className="mt-2 text-xs text-ink-soft">
