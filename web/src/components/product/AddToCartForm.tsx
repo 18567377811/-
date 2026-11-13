@@ -6,7 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { ContactUsButton } from "@/components/layout/social";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
 import { useRegion } from "@/components/layout/RegionProvider";
-import { startStripeCheckout } from "@/lib/checkout-client";
+import { startPayPalCheckout } from "@/lib/checkout-client";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
 
@@ -59,7 +59,7 @@ export function AddToCartForm({ product }: { product: Product }) {
     setError(null);
     setBuying(true);
     try {
-      await startStripeCheckout({
+      await startPayPalCheckout({
         items: [
           {
             productId: product.id,

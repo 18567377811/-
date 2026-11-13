@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { ContactUsButton } from "@/components/layout/social";
 import { useRevealOnView, revealClass } from "@/hooks/useRevealOnView";
-import { startStripeCheckout } from "@/lib/checkout-client";
+import { startPayPalCheckout } from "@/lib/checkout-client";
 import { cardPlainText } from "@/lib/html-text";
 import { useRegion } from "@/components/layout/RegionProvider";
 import { useCartStore } from "@/store/cart";
@@ -80,7 +80,7 @@ function FeaturedActions({ product }: { product: Product }) {
           if (!variant || buying) return;
           setBuyError(null);
           setBuying(true);
-          void startStripeCheckout({
+          void startPayPalCheckout({
             items: [
               {
                 productId: product.id,

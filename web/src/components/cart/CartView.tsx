@@ -5,7 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { QuantityStepper } from "@/components/ui/QuantityStepper";
-import { startStripeCheckout } from "@/lib/checkout-client";
+import {
+  isPayPalClientEnabled,
+  startPayPalCheckout,
+} from "@/lib/checkout-client";
 import { useRegion } from "@/components/layout/RegionProvider";
 import { useCartStore } from "@/store/cart";
 import type { Product } from "@/types/commerce";
@@ -47,7 +50,6 @@ export function CartView({ products }: { products: Product[] }) {
     }>;
   }, [items, products]);
 
-  // Keep selection in sync when cart lines change; default new lines to checked.
   useEffect(() => {
     setSelected((prev) => {
       const next: Record<string, boolean> = {};
@@ -79,6 +81,13 @@ export function CartView({ products }: { products: Product[] }) {
     setSelected(next);
   }
 
+  const paypalEnabled = isPayPalClientEnabled();
+  const checkoutItems = selectedLines.map((line) => ({
+    productId: line.item.productId,
+    variantId: line.item.variantId,
+    quantity: line.item.quantity,
+  }));
+
   async function startCheckout() {
     setError(null);
     if (selectedLines.length === 0) {
@@ -87,14 +96,14 @@ export function CartView({ products }: { products: Product[] }) {
       );
       return;
     }
+    if (!paypalEnabled) {
+      setError(t("cart.noPaymentConfigured"));
+      return;
+    }
     setCheckingOut(true);
     try {
-      await startStripeCheckout({
-        items: selectedLines.map((line) => ({
-          productId: line.item.productId,
-          variantId: line.item.variantId,
-          quantity: line.item.quantity,
-        })),
+      await startPayPalCheckout({
+        items: checkoutItems,
         locale,
         cancelPath: "/cart",
       });
@@ -152,7 +161,9 @@ export function CartView({ products }: { products: Product[] }) {
                   className="mt-10 h-4 w-4 shrink-0 accent-[var(--accent)]"
                   checked={checked}
                   aria-label={
-                    locale === "zh" ? `选择 ${product.name}` : `Select ${product.name}`
+                    locale === "zh"
+                      ? `选择 ${product.name}`
+                      : `Select ${product.name}`
                   }
                   onChange={(event) =>
                     setSelected((prev) => ({
@@ -237,11 +248,16 @@ export function CartView({ products }: { products: Product[] }) {
         <button
           type="button"
           className="btn-primary mt-6 w-full disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={checkingOut || selectedLines.length === 0}
+          disabled={checkingOut || selectedLines.length === 0 || !paypalEnabled}
           onClick={() => void startCheckout()}
         >
           {checkingOut ? t("cart.checkoutLoading") : t("cart.checkout")}
         </button>
+        {!paypalEnabled ? (
+          <p className="mt-3 text-sm text-clay" role="alert">
+            {t("cart.noPaymentConfigured")}
+          </p>
+        ) : null}
       </aside>
     </div>
   );

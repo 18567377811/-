@@ -1,8 +1,28 @@
 /**
- * Icons for methods Stripe Checkout can present with our USD + dynamic PM setup.
- * Card brands + Apple Pay / Google Pay / Link (no Shop Pay / PayPal unless enabled).
+ * Icons for methods buyers commonly use via PayPal Checkout (wallet + cards).
  */
 const PAYMENT_METHODS = [
+  {
+    id: "paypal",
+    label: "PayPal",
+    mark: (
+      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
+        <rect width="48" height="32" rx="4" fill="#fff" stroke="#E5E5E5" />
+        <path
+          fill="#003087"
+          d="M18.4 8.2h6.2c2.6 0 4.1 1.3 3.8 3.7-.4 2.8-2.3 4.4-5 4.4h-2.3l-.9 4.8h-2.5l2.7-13Z"
+        />
+        <path
+          fill="#009CDE"
+          d="M20.2 10.1h4.6c1.5 0 2.5.7 2.3 2.2-.3 1.8-1.5 2.8-3.3 2.8h-1.8l-.8 4.1h-1.8l2.8-9.1Z"
+        />
+        <path
+          fill="#012169"
+          d="M14.2 8.2h2.6l-2.7 13H11.6l.6-3.1c-.8.9-2 1.4-3.4 1.4-2.1 0-3.5-1.6-2.9-4 .6-2.5 2.7-4 5.1-4 .8 0 1.6.2 2.3.6l.9-3.9Zm-3.2 8.4c.9 0 1.7-.6 2-1.5.3-1.1-.2-1.8-1.2-1.8-.9 0-1.7.6-2 1.5-.3 1.1.2 1.8 1.2 1.8Z"
+        />
+      </svg>
+    ),
+  },
   {
     id: "visa",
     label: "Visa",
@@ -29,82 +49,6 @@ const PAYMENT_METHODS = [
           fill="#FF5F00"
           d="M24 10.1a8 8 0 0 1 0 11.8 8 8 0 0 1 0-11.8Z"
         />
-      </svg>
-    ),
-  },
-  {
-    id: "amex",
-    label: "American Express",
-    mark: (
-      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
-        <rect width="48" height="32" rx="4" fill="#2E77BC" />
-        <text
-          x="24"
-          y="19.5"
-          textAnchor="middle"
-          fill="#fff"
-          fontSize="8"
-          fontFamily="Arial, sans-serif"
-          fontWeight="700"
-        >
-          AMEX
-        </text>
-      </svg>
-    ),
-  },
-  {
-    id: "unionpay",
-    label: "UnionPay",
-    mark: (
-      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
-        <rect width="48" height="32" rx="4" fill="#fff" stroke="#E5E5E5" />
-        <rect x="8" y="8" width="10" height="16" rx="1.5" fill="#D10429" />
-        <rect x="19" y="8" width="10" height="16" rx="1.5" fill="#024C98" />
-        <rect x="30" y="8" width="10" height="16" rx="1.5" fill="#067266" />
-      </svg>
-    ),
-  },
-  {
-    id: "apple-pay",
-    label: "Apple Pay",
-    mark: (
-      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
-        <rect width="48" height="32" rx="4" fill="#111" />
-        <path
-          fill="#fff"
-          d="M18.2 12.2c0-1 .5-1.9 1.3-2.5-.6.1-1.4.5-1.8 1-.4.5-.8 1.3-.7 2 .7.1 1.4-.3 1.2-.5Zm1.9 1c-1.4 0-2.5.8-2.5.8s-.3-.9-1.3-.9c-.9 0-1.7.6-2.1 1.5-.9 1.6-.2 3.9.7 5.2.4.6.9 1.2 1.6 1.2.6 0 .9-.4 1.7-.4.8 0 1 .4 1.7.4.7 0 1.1-.6 1.5-1.1.5-.7.7-1.3.7-1.4-.1 0-1.3-.5-1.3-1.9 0-1.2.9-1.7.9-1.7s-.8-1.2-1.6-1.2Zm4.1 7.6V11.5h1.5v.7c.3-.4.9-.9 1.8-.9.5 0 1 .1 1.3.4l-.6 1.3c-.2-.2-.5-.3-.9-.3-.9 0-1.5.7-1.5 1.9v5.2h-1.6Zm6.1.2c-1.7 0-2.9-1.1-2.9-2.8 0-1.8 1.3-2.9 3-2.9.6 0 1.1.1 1.5.3v-.3c0-1-.6-1.5-1.6-1.5-.7 0-1.3.3-1.7.6l-.6-1.1c.6-.5 1.5-.8 2.5-.8 1.7 0 2.9 1 2.9 2.9v5.4h-1.4v-.6c-.4.4-1.1.8-2 .8Zm.4-1.3c1 0 1.7-.7 1.7-1.7v-.6c-.3-.2-.8-.4-1.4-.4-.8 0-1.5.5-1.5 1.4 0 .8.6 1.3 1.2 1.3Zm5.5 1.3c-1.1 0-1.9-.5-2.3-1.3l1.2-.7c.2.5.7.8 1.2.8.6 0 1-.3 1-.8 0-1.4-3.3-.5-3.3-2.7 0-1.1 1-2 2.4-2 1 0 1.8.4 2.2 1.1l-1.2.7c-.2-.4-.6-.6-1-.6-.5 0-.8.3-.8.6 0 1.3 3.3.4 3.3 2.7 0 1.3-1.1 2.1-2.7 2.1Z"
-        />
-      </svg>
-    ),
-  },
-  {
-    id: "google-pay",
-    label: "Google Pay",
-    mark: (
-      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
-        <rect width="48" height="32" rx="4" fill="#fff" stroke="#E5E5E5" />
-        <path fill="#4285F4" d="M22.2 16.3v-2.1h6.2c.1.5.1 1.1.1 1.6 0 2.1-.6 3.8-1.6 4.9-1.1 1.2-2.6 1.8-4.7 1.8-3.8 0-6.9-3.1-6.9-6.9s3.1-6.9 6.9-6.9c2 0 3.5.8 4.6 1.8l-1.5 1.5c-.7-.7-1.8-1.3-3.1-1.3-2.5 0-4.5 2.1-4.5 4.9s2 4.9 4.5 4.9c1.6 0 2.6-.7 3.1-1.6.4-.6.6-1.4.7-2.5h-4.8Z" />
-        <path fill="#3C4043" d="M30.2 20.8v-7.8h2v7.8h-2Zm5.7 0-3.7-7.8h2.2l2.2 4.9 2.2-4.9h2.1l-3.6 7.8h-1.4Z" />
-      </svg>
-    ),
-  },
-  {
-    id: "link",
-    label: "Link",
-    mark: (
-      <svg viewBox="0 0 48 32" className="h-5 w-8" aria-hidden>
-        <rect width="48" height="32" rx="4" fill="#00D66F" />
-        <text
-          x="24"
-          y="19.5"
-          textAnchor="middle"
-          fill="#0A2540"
-          fontSize="10"
-          fontFamily="Arial, sans-serif"
-          fontWeight="700"
-        >
-          Link
-        </text>
       </svg>
     ),
   },

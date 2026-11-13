@@ -162,8 +162,12 @@
     "empty": "Your cart is empty",
     "subtotal": "Subtotal",
     "checkout": "Checkout",
+    "checkoutCard": "Pay with card / Stripe",
     "checkoutLoading": "Redirecting…",
     "checkoutError": "Could not start checkout. Please try again.",
+    "orPayWith": "or pay with",
+    "paypalHint": "Pay securely with PayPal (balance or most international cards).",
+    "noPaymentConfigured": "Payments are not configured yet. Please contact the seller.",
     "remove": "Remove",
     "quantity": "Qty",
     "note": "After payment, we’ll email you a secure link to upload pet photos."
@@ -174,7 +178,14 @@
     "successBody": "We’ll email next steps for photo upload shortly. Keep an eye on your inbox (and spam folder).",
     "reference": "Reference",
     "photoGuide": "Photo guide",
-    "backHome": "Back home"
+    "backHome": "Back home",
+    "backCart": "Back to cart",
+    "paypalProcessingEyebrow": "Confirming payment",
+    "paypalProcessingTitle": "Just a moment…",
+    "paypalProcessingBody": "We’re confirming your PayPal payment, then you’ll land on the success page.",
+    "paypalCaptureTitle": "Payment confirmation failed",
+    "paypalCaptureError": "Could not confirm the PayPal payment. Please try again from the cart or contact us.",
+    "paypalMissing": "Missing PayPal order id. Please checkout again."
   },
   "footer": {
     "shop": "Shop",
@@ -185,7 +196,7 @@
     "terms": "Terms of Service",
     "care": "Care Instruction",
     "rights": "© {year} Feltora. Handmade with wool.",
-    "powered": "Secure checkout powered by Stripe."
+    "powered": "Secure checkout powered by PayPal."
   },
   "search": {
     "resultsFor": "{count} results for “{query}”",

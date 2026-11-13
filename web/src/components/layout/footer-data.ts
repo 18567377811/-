@@ -22,21 +22,11 @@ export const SOCIAL_LINKS = [
   },
 ] as const;
 
-/**
- * Methods aligned with Stripe Checkout for Feltora:
- * cards + wallets Stripe enables by default for USD / overseas Checkout.
- * (No Shop Pay — that’s Shopify; no PayPal unless separately enabled.)
- */
-export const STRIPE_FOOTER_METHODS = [
+/** Footer payment marks shown on the storefront (PayPal Checkout). */
+export const FOOTER_PAYMENT_METHODS = [
+  "paypal",
   "visa",
   "mastercard",
-  "amex",
-  "unionpay",
-  "discover",
-  "jcb",
-  "applepay",
-  "googlepay",
-  "link",
 ] as const;
 
-export type StripeFooterMethod = (typeof STRIPE_FOOTER_METHODS)[number];
+export type FooterPaymentMethod = (typeof FOOTER_PAYMENT_METHODS)[number];

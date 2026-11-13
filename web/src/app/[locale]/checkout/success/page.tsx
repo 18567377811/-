@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ session_id?: string }>;
+  searchParams: Promise<{ session_id?: string; paypal_order_id?: string }>;
 };
 
 export default async function CheckoutSuccessPage({
@@ -12,9 +12,11 @@ export default async function CheckoutSuccessPage({
   searchParams,
 }: Props) {
   const { locale } = await params;
-  const { session_id: sessionId } = await searchParams;
+  const { session_id: sessionId, paypal_order_id: paypalOrderId } =
+    await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("checkout");
+  const reference = paypalOrderId || sessionId || null;
 
   return (
     <div className="mx-auto max-w-2xl px-3 pt-10 pb-20 sm:px-6 sm:pt-12">
@@ -28,9 +30,9 @@ export default async function CheckoutSuccessPage({
       <p className="mt-5 text-lg leading-relaxed text-ink-soft">
         {t("successBody")}
       </p>
-      {sessionId ? (
+      {reference ? (
         <p className="mt-4 break-all text-xs text-ink-soft/80">
-          {t("reference")}: {sessionId}
+          {t("reference")}: {reference}
         </p>
       ) : null}
       <div className="mt-10 flex flex-wrap gap-3">

@@ -37,7 +37,9 @@ const COMMISSION_STATUS_LABELS = Object.fromEntries(
 
 type Order = {
   id: string;
-  stripeSessionId: string;
+  paymentProvider?: string | null;
+  stripeSessionId: string | null;
+  paypalOrderId?: string | null;
   amountTotal: number | null;
   currency: string | null;
   customerEmail: string | null;
@@ -255,6 +257,7 @@ export default function AdminOrdersPage() {
                   </p>
                   <p className="mt-0.5 text-xs text-[var(--ios-secondary)]">
                     {STATUS_LABELS[order.status] ?? order.status} ·{" "}
+                    {(order.paymentProvider || "stripe").toUpperCase()} ·{" "}
                     {formatMoney(order)}
                   </p>
                 </div>
@@ -308,6 +311,15 @@ export default function AdminOrdersPage() {
                 </p>
                 <p className="mt-3 text-xl font-semibold">
                   {formatMoney(selected)}
+                </p>
+                <p className="mt-2 break-all text-xs text-[var(--ios-secondary)]">
+                  {(selected.paymentProvider || "stripe").toUpperCase()}
+                  {selected.paypalOrderId
+                    ? ` · PayPal ${selected.paypalOrderId}`
+                    : null}
+                  {selected.stripeSessionId
+                    ? ` · Stripe ${selected.stripeSessionId}`
+                    : null}
                 </p>
               </div>
             </Section>

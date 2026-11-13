@@ -1,12 +1,17 @@
 import type { CartItem } from "@/types/commerce";
 
-export async function startStripeCheckout(options: {
+export function isPayPalClientEnabled() {
+  return Boolean(process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID);
+}
+
+/** Same UX as the old Stripe Checkout: create order → redirect to PayPal. */
+export async function startPayPalCheckout(options: {
   items: CartItem[];
   locale: string;
   /** Relative path after locale, e.g. `/products/foo` or `/cart` */
   cancelPath?: string;
 }): Promise<void> {
-  const response = await fetch("/api/checkout", {
+  const response = await fetch("/api/paypal/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -15,7 +20,11 @@ export async function startStripeCheckout(options: {
       cancelPath: options.cancelPath || "/cart",
     }),
   });
-  const data = (await response.json()) as { url?: string; error?: string };
+  const data = (await response.json()) as {
+    url?: string;
+    id?: string;
+    error?: string;
+  };
   if (!response.ok || !data.url) {
     throw new Error(data.error || "Checkout failed");
   }

@@ -162,8 +162,12 @@
     "empty": "Troli anda kosong",
     "subtotal": "Jumlah kecil",
     "checkout": "Bayar",
+    "checkoutCard": "Bayar dengan kad / Stripe",
     "checkoutLoading": "Mengalihkan…",
     "checkoutError": "Tidak dapat memulakan pembayaran. Sila cuba lagi.",
+    "orPayWith": "atau bayar dengan",
+    "paypalHint": "Bayar dengan selamat melalui PayPal (baki atau kebanyakan kad antarabangsa).",
+    "noPaymentConfigured": "Pembayaran belum dikonfigurasi. Sila hubungi penjual.",
     "remove": "Buang",
     "quantity": "Knt",
     "note": "Selepas bayaran, kami akan e-mel pautan selamat untuk muat naik foto haiwan."
@@ -174,7 +178,14 @@
     "successBody": "Kami akan e-mel langkah seterusnya untuk muat naik foto. Semak peti masuk (dan spam).",
     "reference": "Rujukan",
     "photoGuide": "Panduan foto",
-    "backHome": "Kembali ke laman utama"
+    "backHome": "Kembali ke laman utama",
+    "backCart": "Kembali ke troli",
+    "paypalProcessingEyebrow": "Mengesahkan bayaran",
+    "paypalProcessingTitle": "Sila tunggu…",
+    "paypalProcessingBody": "Kami sedang mengesahkan bayaran PayPal anda, kemudian akan ke halaman kejayaan.",
+    "paypalCaptureTitle": "Pengesahan bayaran gagal",
+    "paypalCaptureError": "Tidak dapat mengesahkan bayaran PayPal. Sila cuba lagi dari troli atau hubungi kami.",
+    "paypalMissing": "Tiada ID pesanan PayPal. Sila buat checkout semula."
   },
   "footer": {
     "shop": "Kedai",
@@ -185,7 +196,7 @@
     "terms": "Terma Perkhidmatan",
     "care": "Arahan Penjagaan",
     "rights": "© {year} Feltora. Handmade dengan bulu.",
-    "powered": "Pembayaran selamat dikuasakan oleh Stripe."
+    "powered": "Pembayaran selamat dikuasakan oleh PayPal."
   },
   "search": {
     "resultsFor": "{count} keputusan untuk “{query}”",

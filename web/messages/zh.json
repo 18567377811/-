@@ -162,8 +162,12 @@
     "empty": "购物车是空的",
     "subtotal": "小计",
     "checkout": "去结算",
+    "checkoutCard": "银行卡 / Stripe 结算",
     "checkoutLoading": "正在跳转…",
     "checkoutError": "无法开始结算，请稍后再试。",
+    "orPayWith": "或使用",
+    "paypalHint": "使用 PayPal 安全付款（支持 PayPal 余额与多数国际卡）。",
+    "noPaymentConfigured": "支付尚未配置，请联系卖家。",
     "remove": "移除",
     "quantity": "数量",
     "note": "付款后我们会发邮件，附上安全链接供你上传宠物照片。"
@@ -174,7 +178,14 @@
     "successBody": "我们会尽快邮件告知上传宠物照片的下一步。请留意收件箱（含垃圾邮件）。",
     "reference": "订单参考号",
     "photoGuide": "拍照指南",
-    "backHome": "返回首页"
+    "backHome": "返回首页",
+    "backCart": "返回购物车",
+    "paypalProcessingEyebrow": "正在确认付款",
+    "paypalProcessingTitle": "请稍候…",
+    "paypalProcessingBody": "正在向 PayPal 确认这笔付款，马上跳转成功页。",
+    "paypalCaptureTitle": "付款确认失败",
+    "paypalCaptureError": "无法确认 PayPal 付款，请稍后在购物车重试或联系我们。",
+    "paypalMissing": "缺少 PayPal 订单号，请重新结算。"
   },
   "footer": {
     "shop": "选购",
@@ -185,7 +196,7 @@
     "terms": "服务条款",
     "care": "护理说明",
     "rights": "© {year} Feltora。羊毛手工制作。",
-    "powered": "安全结算由 Stripe 提供。"
+    "powered": "安全结算由 PayPal 提供。"
   },
   "search": {
     "resultsFor": "“{query}” 的 {count} 个结果",

@@ -108,7 +108,10 @@ model HeroSlide {
 
 model Order {
   id              String      @id @default(cuid())
-  stripeSessionId String      @unique
+  /** stripe | paypal */
+  paymentProvider String      @default("stripe")
+  stripeSessionId String?     @unique
+  paypalOrderId   String?     @unique
   amountTotal     Int?
   currency        String?
   customerEmail   String?
